@@ -1,0 +1,8 @@
+{
+  "name": "human-noise",
+  "description": "hide a simulation in a game",
+  "author": "Gary Klindt <gary.klindt@googlemail.com>",
+  "dependencies": {
+    "websocket": ">1.0.0"
+  }
+}
