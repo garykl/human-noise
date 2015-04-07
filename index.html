@@ -6,8 +6,8 @@
     <meta charset="utf-8">
     <title>WebSockets - Simple chat</title>
 
+    <script src='ramda.js' type='text/javascript'></script>
     <script src='svg.js' type='text/javascript'></script>
-    <script src='../ramda/dist/ramda.js' type='text/javascript'></script>
   </head>
 
   <body>
@@ -31,6 +31,8 @@ svg = SVG();
 var setAgent = function (agent, position, velocity) {
   if (velocity < 0) {
     svg.setRotation(agent, 180);
+  } else {
+    svg.setRotation(agent, 0);
   }
   svg.setTranslation(agent, [position + 100, 100]);
 }
