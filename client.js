@@ -2,7 +2,6 @@ var content = document.getElementById('content');
 var input = document.getElementById('input');
 var field = document.getElementById('field');
 
-var clientName = false;
 
 window.WebSocket = window.WebSocket || window.MozWebSocket;
 if (!window.WebSocket) {
@@ -12,7 +11,7 @@ if (!window.WebSocket) {
 
 var connection = new WebSocket('ws://127.0.0.1:1337');
 connection.onopen = function () {
-    field.innerHTML = 'Choose name:';
+    field.innerHTML = 'Acceleration';
 };
 
 connection.onerror = function (error) {
@@ -21,9 +20,9 @@ connection.onerror = function (error) {
 
 
 var workWithAgent = function (f, obj) {
-    var number = obj.names.length;
+    var number = obj.ids.length;
     for (var i = 0; i < number; i++) {
-        f(obj.names[i], obj.positions[i], obj.velocities[i]);
+        f(obj.ids[i], obj.positions[i], obj.velocities[i]);
     }
 }
 
@@ -35,8 +34,12 @@ connection.onmessage = function (message) {
         return;
     }
 
-    if (json.type === 'new') { workWithAgent(newAgent, json); }
-    if (json.type === 'old') { workWithAgent(updateAgent, json); }
+    if (json.spawned !== undefined) {
+        workWithAgent(newAgent, json.spawned);
+    }
+    if (json.existing !== undefined) {
+        workWithAgent(updateAgent, json.existing);
+    }
 };
 
 
@@ -48,11 +51,6 @@ input.onkeypress = function(e) {
 
         connection.send(msg);
         input.value = '';
-        field.innerHTML = 'Acceleration: ';
-
-        if (clientName === false) {
-            clientName = msg;
-        }
     }
 };
 

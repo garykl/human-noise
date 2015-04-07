@@ -1,23 +1,78 @@
 var webSocketServer = require('websocket').server;
 var http = require('http');
+var assert = require('assert');
 
 "use strict";
 process.title = 'node-simulation';
 var portnumber = 1337;
 
 
-var positions = [];
-var velocities = [];
-var dt = 1;
-var names = [];
 var radius = 10;
 var clients = [];
+var intitialVelocity = 1;
 
 
-var integrateSystem = function () {
-    for (var i = 0; i < names.length; i++) {
-        positions[i] += velocities[i] * dt;
+var model = function () {
+
+    var positions = [];
+    var velocities = [];
+
+    var dt = 1;
+
+
+    var addAgent = function (position, velocity) {
+        var newIndex = positions.length;
+
+        positions[newIndex] = position
+        velocities[newIndex] = velocity;
+
+        return newIndex;
     }
+
+    var accelerateAgent = function (index, acceleration) {
+        velocities[index] += acceleration * dt;
+    }
+
+    var integrateSystem = function () {
+        for (var i = 0; i < positions.length; i++) {
+            positions[i] += velocities[i] * dt;
+        }
+    }
+
+    var state = function () {
+        return {
+            ids: range(positions.length),
+            positions: positions,
+            velocities: velocities
+        }
+    }
+
+    var stateOf = function (index) {
+        return {
+            ids : [index],
+            positions: [positions[index]],
+            velocities: [velocities[index]]
+        }
+    }
+
+    return {
+        addAgent: addAgent,
+        accelerateAgent: accelerateAgent,
+        integrateSystem: integrateSystem,
+        state: state,
+        stateOf: stateOf
+    }
+}
+
+var m = model();
+
+
+var range = function (n) {
+    var res = [];
+    for (var i = 0; i < n; i++) {
+        res[i] = i;
+    }
+    return res;
 }
 
 
@@ -35,66 +90,46 @@ server.listen(portnumber, function() {
 var wsServer = new webSocketServer({ httpServer: server });
 
 
-var initializeClient = function (connection, name) {
+var initializeClient = function (connection) {
 
     var initialVelocity = 1;
 
     var clientIndex = clients.push(connection) - 1;
-    positions[clientIndex] = Math.random() * 100;
-    velocities[clientIndex] = initialVelocity;
-    names[clientIndex] = name;
+    assert.equal(clientIndex, m.addAgent(Math.random() * 100, initialVelocity),
+                 'different clientIndices!');
 
     return clientIndex;
 }
 
+
+var broadcast = function (string) {
+    for (var i = 0; i < clients.length; i++) { clients[i].sendUTF(string); }
+}
+
+
 wsServer.on('request', function(request) {
 
     var connection = request.accept(null, request.origin);
-    var nameFlag = false;
-    var clientIndex = undefined;
+
+    // send back trajectory
+    connection.sendUTF(JSON.stringify({ 'spawned': m.state() }));
+
+    var clientIndex = initializeClient(connection);
+
+    // all other clients need to know about the new agent, too
+    for (var i = 0; i < clients.length; i++) {
+        clients[i].sendUTF(JSON.stringify({ 'spawned': m.stateOf(clientIndex) }));
+    };
 
     connection.on('message', function(message) {
 
+        console.log('client ' + clientIndex + ' sends ' + message.utf8Data);
+
         if (message.type === 'utf8') {
 
-            // the first connection brings us a name:
-            if (!nameFlag) {
-                nameFlag = true;
+            var acceleration = Number(message.utf8Data);
+            m.accelerateAgent(clientIndex, acceleration);
 
-                console.log(message);
-                clientIndex = initializeClient(connection,
-                                               htmlEntities(message.utf8Data));
-
-                // send back trajectory
-                connection.sendUTF(
-                    JSON.stringify(
-                        {
-                            type: 'new',
-                            names: names,
-                            positions: positions,
-                            velocities: velocities
-                        }));
-
-                // all other clients need to know about the new agent, too
-                for (var i = 0; i < clients.length; i++) {
-                    if (i !== clientIndex) {
-                        clients[i].sendUTF(JSON.stringify({
-                            type: 'new',
-                            names: [names[clientIndex]],
-                            positions: [positions[clientIndex]],
-                            velocities: [velocities[clientIndex]],
-                        }));
-                    }
-                };
-
-
-            // if not the name is send, then the acceleration information
-            } else {
-
-                var acceleration = Number(message.utf8Data);
-                velocities[clientIndex] += acceleration * dt;
-
-            }
         }
 
     });
@@ -108,15 +143,10 @@ wsServer.on('request', function(request) {
 // integrate the system and send data to clients regularly
 setInterval(function () {
 
-    integrateSystem();
+    m.integrateSystem();
 
     for (var i = 0; i < clients.length; i++) {
-        clients[i].sendUTF(JSON.stringify({
-            type: 'old',
-            names: names,
-            positions: positions,
-            velocities: velocities,
-        }));
+        clients[i].sendUTF(JSON.stringify({ 'existing': m.state() }));
     }
 
 }, 40);
