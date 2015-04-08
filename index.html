@@ -65,15 +65,48 @@ var connection = initializeWebsocket('ws://127.0.0.1:1337');
 configureConnection(connection, uiBuilder.drawAgents, uiBuilder.onerror);
 
 // send messages
-var input = document.getElementById('input');
-input.onkeypress = function(e) {
-    console.log(e.keyCode);
+var accelerationSender = function (connection) {
+  var keydown = false;
 
-    // Left arrow key
-    if (e.keyCode === 37) { connection.send('-1'); }
-    if (e.keyCode === 39) { connection.send('1'); }
-};
+  var sendAcceleration = function (acceleration) {
+    //if (keyTimer !== undefined) {
+      //clearInterval(keyTimer);
+    //}
+    //keyTimer = setInterval(function () {
+    if (!keydown) { connection.send(acceleration + ''); }
+    //}, 100)
+  }
 
+  document.onkeydown = function(e) {
+
+      // Left arrow key
+      if (e.keyCode === 37) { sendAcceleration(-1); }
+      // Right arrow key
+      if (e.keyCode === 39) { sendAcceleration(1); }
+
+      keydown = true;
+  };
+
+  document.onkeyup = function (e) {
+    //clearInterval(keyTimer);
+    keydown = false;
+    if (e.keyCode === 37) { sendAcceleration(1); }
+    if (e.keyCode === 39) { sendAcceleration(-1); }
+  }
+
+  var stopSending = function () {
+    document.onkeydown = undefined;
+    document.onkeyup = undefined;
+    if (keyTimer !== undefined) {
+      clearInterval(keyTimer);
+    }
+  }
+
+  return stopSending;
+}
+
+
+var stopSending = accelerationSender(connection);
 
     </script>
   </body>
