@@ -33,7 +33,7 @@ var initializeClient = function (request) {
     cs.send(cindex, 'spawned', m.state());
 
     var initialVelocity = 1;
-    var mindex = m.addAgent(Math.random() * 100, initialVelocity);
+    var mindex = m.addAgent([0, Math.random() * 100], [30, 30]);
 
     assert.equal(cindex, mindex, 'indices from connections and model must agree');
 
@@ -74,4 +74,4 @@ setInterval(function () {
     m.integrateSystem();
     cs.broadcast('existing', m.state());
 
-}, 40);
+}, 100);

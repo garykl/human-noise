@@ -12,31 +12,28 @@ var modelBuilder = function (textContainer, svgContainer) {
     var workWithAgent = function (f, obj) {
         var number = obj.ids.length;
         for (var i = 0; i < number; i++) {
-            f(obj.ids[i], obj.positions[i], obj.velocities[i]);
+            f(obj.ids[i], obj.x[i], obj.y[i], obj.vx[i], obj.vy[i]);
         }
     };
 
 
-    var setAgent = function (agent, position, velocity) {
-        if (velocity < 0) {
-            svg.setRotation(agent, 180);
-        } else {
-            svg.setRotation(agent, 0);
-        }
-        svg.setTranslation(agent, [position + 100, 100]);
+    var setAgent = function (agent, x, y, vx, vy) {
+        var angle = Math.atan2(vy, vx) * 180 / Math.PI + 360;
+        svg.setRotation(agent, angle);
+        svg.setTranslation(agent, [x + 100, y + 100]);
     };
 
 
-    var newAgent = function (name, position, velocity) {
+    var newAgent = function (name, x, y, vx, vy) {
         var agent = svg.setScaling(svg.arrow({ 'id': name }), 100);
-        setAgent(agent, position, velocity);
+        setAgent(agent, x, y, vx, vy);
         svgContainer.appendChild(agent);
     };
 
 
-    var updateAgent = function (name, position, velocity) {
+    var updateAgent = function (name, x, y, vx, vy) {
         var agent = document.getElementById(name);
-        setAgent(agent, position, velocity);
+        setAgent(agent, x, y, vx, vy);
     };
 
     return {

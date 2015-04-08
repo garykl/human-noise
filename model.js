@@ -10,44 +10,67 @@ var range = function (n) {
 
 module.exports = function () {
 
-    var positions = [];
-    var velocities = [];
+    // var positions = [];
+    var x = [];
+    var y = [];
+    // var velocities = [];
+    var vx = [];
+    var vy = [];
 
     var dt = 1;
 
 
     var addAgent = function (position, velocity) {
-        var newIndex = positions.length;
+        var newIndex = x.length;
 
-        positions[newIndex] = position
-        velocities[newIndex] = velocity;
+        //positions[newIndex] = position
+        x[newIndex] = position[0];
+        y[newIndex] = position[1];
+        //velocities[newIndex] = velocity;
+        vx[newIndex] = velocity[0];
+        vy[newIndex] = velocity[1];
 
         return newIndex;
     }
 
     var accelerateAgent = function (index, acceleration) {
-        velocities[index] += acceleration * dt;
+        // consider only changes in the direction, velocity is rotated.
+        var angle = acceleration * dt;
+        t_vx = Math.cos(angle) * vx[index] + Math.sin(angle) * vy[index];
+        t_vy = -Math.sin(angle) * vx[index] + Math.cos(angle) * vy[index];
+        vx[index] = t_vx
+        vy[index] = t_vy
     }
 
     var integrateSystem = function () {
-        for (var i = 0; i < positions.length; i++) {
-            positions[i] += velocities[i] * dt;
+        for (var i = 0; i < x.length; i++) {
+            //positions[i] += velocities[i] * dt;
+            x[i] += vx[i] * dt;
+            y[i] += vy[i] * dt;
         }
     }
 
     var state = function () {
         return {
-            ids: range(positions.length),
-            positions: positions,
-            velocities: velocities
+            ids: range(x.length),
+            //positions: positions,
+            x: x,
+            y: y,
+            //velocities: velocities
+            vx: vx,
+            vy: vy
         }
     }
 
     var stateOf = function (index) {
         return {
             ids : [index],
-            positions: [positions[index]],
-            velocities: [velocities[index]]
+            //positions: [positions[index]],
+            //velocities: [velocities[index]]
+            x: [x[index]],
+            y: [y[index]],
+            vx: [vx[index]],
+            vy: [vy[index]]
         }
     }
 

@@ -58,52 +58,52 @@ var svg = SVG();
 // prepare UI
 var uiBuilder = initializeUI()
 
-// start websocket
-var connection = initializeWebsocket('ws://127.0.0.1:1337');
+  // start websocket
+  var connection = initializeWebsocket('ws://127.0.0.1:1337');
 
-// connect the ui with the socket
-configureConnection(connection, uiBuilder.drawAgents, uiBuilder.onerror);
+  // connect the ui with the socket
+  configureConnection(connection, uiBuilder.drawAgents, uiBuilder.onerror);
 
-// send messages
-var accelerationSender = function (connection) {
-  var keydown = false;
+  // send messages
+  var accelerationSender = function (connection) {
+    var keyTimer = undefined;
 
-  var sendAcceleration = function (acceleration) {
-    //if (keyTimer !== undefined) {
-      //clearInterval(keyTimer);
-    //}
-    //keyTimer = setInterval(function () {
-    if (!keydown) { connection.send(acceleration + ''); }
-    //}, 100)
-  }
+    var clearLoop = function () {
+      if (keyTimer !== undefined) {
+        clearInterval(keyTimer);
+        keyTimer = undefined;
+      }
+    }
 
-  document.onkeydown = function(e) {
+    var sendAcceleration = function (acceleration) {
+      if (keyTimer !== undefined) { return; }
+      keyTimer = setInterval(function () {
+        console.log(acceleration);
+        connection.send(acceleration + ''); 
+      }, 30)
+    }
+
+    document.onkeydown = function(e) {
 
       // Left arrow key
-      if (e.keyCode === 37) { sendAcceleration(-1); }
+      if (e.keyCode === 37) { sendAcceleration(0.2); }
       // Right arrow key
-      if (e.keyCode === 39) { sendAcceleration(1); }
+      if (e.keyCode === 39) { sendAcceleration(-0.2); }
 
-      keydown = true;
-  };
+    };
 
-  document.onkeyup = function (e) {
-    //clearInterval(keyTimer);
-    keydown = false;
-    if (e.keyCode === 37) { sendAcceleration(1); }
-    if (e.keyCode === 39) { sendAcceleration(-1); }
-  }
-
-  var stopSending = function () {
-    document.onkeydown = undefined;
-    document.onkeyup = undefined;
-    if (keyTimer !== undefined) {
-      clearInterval(keyTimer);
+    document.onkeyup = function (e) {
+      clearLoop();
     }
-  }
 
-  return stopSending;
-}
+    var stopSending = function () {
+      document.onkeydown = undefined;
+      document.onkeyup = undefined;
+      clearLoop;
+    }
+
+    return stopSending;
+  }
 
 
 var stopSending = accelerationSender(connection);
