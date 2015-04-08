@@ -18,6 +18,7 @@ module.exports = function () {
     var vy = [];
 
     var dt = 1;
+    var size = 800;
 
 
     var addAgent = function (position, velocity) {
@@ -44,9 +45,9 @@ module.exports = function () {
 
     var integrateSystem = function () {
         for (var i = 0; i < x.length; i++) {
-            //positions[i] += velocities[i] * dt;
-            x[i] += vx[i] * dt;
-            y[i] += vy[i] * dt;
+            // consider periodic boundary conditions
+            x[i] = (x[i] + vx[i] * dt + size) % size;
+            y[i] = (y[i] + vy[i] * dt + size) % size;
         }
     }
 
