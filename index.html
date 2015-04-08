@@ -6,47 +6,76 @@
     <meta charset="utf-8">
     <title>WebSockets - Simple chat</title>
 
+    <!-- libraries -->
     <script src='ramda.js' type='text/javascript'></script>
     <script src='svg.js' type='text/javascript'></script>
+
+    <!-- convert model to visualization -->
+    <script src='realize.js' type='text/javascript'></script>
+    <!-- prepare websocket connections behavior -->
+    <script src="client.js" type='text/javascript'></script>
+
   </head>
 
   <body>
     <div id="content"></div>
     <div>
-      <div id="field">Connecting...</div>
       <input type="text" id="input"/>
     </div>
 
-    <script src="./client.js"></script>
     <script type='text/javascript'>
 
-var svgns = 'http://www.w3.org/2000/svg';
-var container = document.createElementNS(svgns, 'svg');
-container.setAttribute('width', 1000);
-container.setAttribute('height', 800);
-document.getElementById('content').appendChild(container);
+// html dom elements
+var textContainer = document.getElementById('content');
+var input = document.getElementById('input');
 
-svg = SVG();
 
-var setAgent = function (agent, position, velocity) {
-  if (velocity < 0) {
-    svg.setRotation(agent, 180);
-  } else {
-    svg.setRotation(agent, 0);
+var initializeWebsocket = function (url) {
+  window.WebSocket = window.WebSocket || window.MozWebSocket;
+  if (!window.WebSocket) {
+    content.innerHTML = '<p>Sorry, but your browser doesn\'t support WebSockets.';
+    return undefined;
   }
-  svg.setTranslation(agent, [position + 100, 100]);
+
+  websocket = new WebSocket(url);
+  return websocket;
 }
 
-var newAgent = function (name, position, velocity) {
-  var agent = svg.setScaling(svg.arrow({ 'id': name }), 100);
-  setAgent(agent, position, velocity);
-  container.appendChild(agent);
-}
 
-var updateAgent = function (name, position, velocity) {
-  var agent = document.getElementById(name);
-  setAgent(agent, position, velocity);
-}
+var initializeUI = function (dom) {
+
+  var svgns = 'http://www.w3.org/2000/svg';
+
+  var container = document.createElementNS(svgns, 'svg');
+  container.setAttribute('width', 1000);
+  container.setAttribute('height', 800);
+
+  dom.appendChild(container);
+  return container;
+
+};
+
+var svg = SVG();
+var svgContainer = initializeUI(textContainer);
+var connection = initializeWebsocket('ws://127.0.0.1:1337');
+
+var uiBuilder = modelBuilder(textContainer, svgContainer);
+
+configureConnection(connection, uiBuilder.drawAgents, uiBuilder.onerror);
+
+
+input.onkeypress = function(e) {
+    console.log(e.keyCode);
+    if (e.keyCode === 13) {
+
+        var msg = input.value;
+        if (!msg) { return; }
+
+        connection.send(msg);
+        input.value = '';
+    }
+};
+
 
     </script>
   </body>

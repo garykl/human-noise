@@ -1,62 +1,40 @@
-var content = document.getElementById('content');
-var input = document.getElementById('input');
-var field = document.getElementById('field');
+var configureConnection = function (connection, drawAgents, onerror) {
+    // connection: object returned by 'new WebSocket'.
+    // drawAgent: a dictionary/object with keys in 'messageType' and values
+    //            being function that takes one argument (JSON object)
+    // onerror: function without arguments
+    //
+    // setup the connection and start a responiveness checking loop.
+
+    connection.onopen = function () {};
+    connection.onerror = function (error) { onerror(); };
 
 
-window.WebSocket = window.WebSocket || window.MozWebSocket;
-if (!window.WebSocket) {
-    content.innerHTML = '<p>Sorry, but your browser doesn\'t support WebSockets.';
-}
+    connection.onmessage = function (message) {
+
+        // the following messages from the server are allowed are allowed
+        var messageTypes = ['spawned', 'existing'];
+
+        try { var json = JSON.parse(message.data); }
+        catch (e) {
+            console.log('message data does not contain JSON', message.data);
+            return;
+        }
+
+        R.map(function (mt) {
+            if (json[mt] !== undefined) { drawAgents[mt](json[mt]); }
+        }, messageTypes)
+    };
 
 
-var connection = new WebSocket('ws://127.0.0.1:1337');
-connection.onopen = function () {
-    field.innerHTML = 'Acceleration';
-};
-
-connection.onerror = function (error) {
-    content.innerHTML = '<p>Sorry, but there\'s some problem with your connection or the server is down.';
-};
-
-
-var workWithAgent = function (f, obj) {
-    var number = obj.ids.length;
-    for (var i = 0; i < number; i++) {
-        f(obj.ids[i], obj.positions[i], obj.velocities[i]);
+    if (connection !== undefined) {
+        setInterval(function() {
+            if (connection.readyState !== 1) {
+                onerror();
+            }
+        }, 3000);
     }
-}
 
-
-connection.onmessage = function (message) {
-    try { var json = JSON.parse(message.data); }
-    catch (e) {
-        console.log('This doesn\'t look like a valid JSON: ', message.data);
-        return;
-    }
-
-    if (json.spawned !== undefined) {
-        workWithAgent(newAgent, json.spawned);
-    }
-    if (json.existing !== undefined) {
-        workWithAgent(updateAgent, json.existing);
-    }
 };
 
 
-input.onkeypress = function(e) {
-    if (e.keyCode === 13) {
-
-        var msg = input.value;
-        if (!msg) { return; }
-
-        connection.send(msg);
-        input.value = '';
-    }
-};
-
-
-setInterval(function() {
-    if (connection.readyState !== 1) {
-        field.innerHTML = 'Error';
-    }
-}, 3000);
