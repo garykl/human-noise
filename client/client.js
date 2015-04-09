@@ -20,10 +20,7 @@ var configureConnection = function (connection, messageCallback, onerror) {
         }
 
 
-        if (json.index !== undefined) {
-            console.log(json);
-            cindex = json.index;
-        }
+        if (json.index !== undefined) { cindex = json.index; }
         else { messageCallback(cindex, json); }
     };
 

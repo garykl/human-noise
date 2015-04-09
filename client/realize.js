@@ -1,23 +1,24 @@
-var modelBuilder = function (textContainer, svgContainer) {
+var modelBuilder = function (size, textContainer, svgContainer) {
 
     var existingAgents = [];
-    var width = svgContainer.getAttribute('width');
-    var height = svgContainer.getAttribute('height');
+    var size = size;
 
 
     var drawAgents = {
         'spawned': function (getIndex, data) { workWithAgent(newAgent, data) },
         'viewport': function (getIndex, data) {
+
             var toberemoved = removedAgents(data.ids);
             R.map(function (id) { removeAgent(id); }, toberemoved);
 
             var number = data.ids.length;
             var currentIndex = getIndex();
+
             if (currentIndex !== undefined) {
                 for (var i = 0; i < number; i++) {
                     maybeNewAgent(data.ids[i],
-                                  data.x[i] - data.x[currentIndex] + 0.5 * width,
-                                  data.y[i] - data.y[currentIndex] + 0.5 * height,
+                                  data.x[i] + 0.5 * size,
+                                  data.y[i] + 0.5 * size,
                                   data.vx[i],
                                   data.vy[i]);
                 }
@@ -41,7 +42,7 @@ var modelBuilder = function (textContainer, svgContainer) {
     var setAgent = function (agent, x, y, vx, vy) {
         var angle = Math.atan2(vy, vx) * 180 / Math.PI + 360;
         svg.setRotation(agent, angle);
-        svg.setTranslation(agent, [x + 100, y + 100]);
+        svg.setTranslation(agent, [x, y]);
     };
 
 

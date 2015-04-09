@@ -30,7 +30,7 @@ module.exports = function () {
         vy[newIndex] = velocity[1];
 
         return newIndex;
-    }
+    };
 
     var accelerateAgent = function (index, acceleration) {
         // consider only changes in the direction, velocity is rotated.
@@ -42,7 +42,7 @@ module.exports = function () {
         //vy[index] = vl * Math.sin(orientation);
         vx[index] = t_vx;
         vy[index] = t_vy;
-    }
+    };
 
     var integrateSystem = function () {
         for (var i = 0; i < x.length; i++) {
@@ -50,7 +50,7 @@ module.exports = function () {
             x[i] = (x[i] + vx[i] * dt + size) % size;
             y[i] = (y[i] + vy[i] * dt + size) % size;
         }
-    }
+    };
 
     var state = function () {
         return {
@@ -61,22 +61,37 @@ module.exports = function () {
     }
 
     var distance = function (i, j) {
-        var dx = x[j] - x[i],
-            dy = y[j] - y[i];
-        if (dx > size * 0.5) { dx = 0.5 * size - dx; }
-        if (dy > size * 0.5) { dy = 0.5 * size - dy; }
-        if (dx < -size * 0.5) { dx = 0.5 * size + dx; }
-        if (dy < -size * 0.5) { dy = 0.5 * size + dy; }
+        var h = relativeCoordinate(i, j),
+            dx = h[0], dy = h[1];
         return Math.sqrt(dx * dx + dy * dy);
     }
 
+    var relativeCoordinate = function (i, j) {
+        // returns the relative vector of j with respect to i,
+        // considering periodicity.
+        var u = x[j] - x[i], v = y[j] - y[i];
+        if (u > size * 0.5) { u -= size; }
+        if (v > size * 0.5) { v -= size; }
+        if (u < -size * 0.5) { u += size; }
+        if (v < -size * 0.5) { v += size; }
+        return [u, v];
+    }
+
     var stateInEnvironmentOf = function (index) {
+        // return the state of agent `index`'s environment in relative
+        // coordinates
         var ids = [], hx = [], hy = [], hvx = [], hvy = [], found = 0;
 
         for (var i = 0;  i < x.length; i++) {
+            var h;
+
             if (distance(i, index) < cutoffRadius) {
+
                 ids[found] = i;
-                hx[found] = x[i]; hy[found] = y[i];
+
+                h = relativeCoordinate(index, i);
+                hx[found] = h[0]; hy[found] = h[1];
+
                 hvx[found] = vx[i]; hvy[found] = vy[i];
                 found++;
             }
