@@ -1,10 +1,11 @@
-var configureConnection = function (connection, drawAgents, onerror) {
+var configureConnection = function (connection, messageCallback, onerror) {
     // connection: object returned by 'new WebSocket'.
     // drawAgent: a dictionary/object with keys in 'messageType' and values
     //            being function that takes one argument (JSON object)
     // onerror: function without arguments
     //
     // setup the connection and start a responiveness checking loop.
+    var cindex;
 
     connection.onopen = function () {};
     connection.onerror = function (error) { onerror(); };
@@ -12,18 +13,18 @@ var configureConnection = function (connection, drawAgents, onerror) {
 
     connection.onmessage = function (message) {
 
-        // the following messages from the server are allowed are allowed
-        var messageTypes = ['spawned', 'viewport'];
-
         try { var json = JSON.parse(message.data); }
         catch (e) {
             console.log('message data does not contain JSON', message.data);
             return;
         }
 
-        R.map(function (mt) {
-            if (json[mt] !== undefined) { drawAgents[mt](json[mt]); }
-        }, messageTypes)
+
+        if (json.index !== undefined) {
+            console.log(json);
+            cindex = json.index;
+        }
+        else { messageCallback(json); }
     };
 
 
@@ -34,6 +35,8 @@ var configureConnection = function (connection, drawAgents, onerror) {
             }
         }, 3000);
     }
+
+    return function () { return cindex; };
 
 };
 

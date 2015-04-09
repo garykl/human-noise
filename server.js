@@ -30,10 +30,11 @@ var initializeClient = function (request) {
     var cindex = cs.addConnection(request);
 
     // the order is very important (next three lines)
-    cs.send(cindex, 'spawned', m.state());
+    cs.send(cindex, 'index', cindex);
 
     var initialVelocity = 1;
-    var mindex = m.addAgent([0, Math.random() * 100], [10, 10]);
+    var mindex = m.addAgent([0, Math.random() * 400],
+                            [10 * (1 - Math.random()), 10 * (1 - Math.random())]);
 
     assert.equal(cindex, mindex, 'indices from connections and model must agree');
 
@@ -48,6 +49,8 @@ wsServer.on('request', function(request) {
 
     var clientIndex = initializeClient(request);
     var connection = cs.at(clientIndex);
+
+    cs.send(clientIndex, 'message', clientIndex + '');
 
     connection.on('message', function(message) {
 

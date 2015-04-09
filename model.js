@@ -35,10 +35,13 @@ module.exports = function () {
     var accelerateAgent = function (index, acceleration) {
         // consider only changes in the direction, velocity is rotated.
         var angle = acceleration * dt;
-        t_vx = Math.cos(angle) * vx[index] + Math.sin(angle) * vy[index];
-        t_vy = -Math.sin(angle) * vx[index] + Math.cos(angle) * vy[index];
-        vx[index] = t_vx
-        vy[index] = t_vy
+        var t_vx = Math.cos(angle) * vx[index] + Math.sin(angle) * vy[index];
+        var t_vy = -Math.sin(angle) * vx[index] + Math.cos(angle) * vy[index];
+        //var vl = Math.sqrt(vx[index] * vx[index] + vy[index] * vy[index]);
+        //vx[index] = vl * Math.cos(orientation);
+        //vy[index] = vl * Math.sin(orientation);
+        vx[index] = t_vx;
+        vy[index] = t_vy;
     }
 
     var integrateSystem = function () {
@@ -60,6 +63,10 @@ module.exports = function () {
     var distance = function (i, j) {
         var dx = x[j] - x[i],
             dy = y[j] - y[i];
+        if (dx > size * 0.5) { dx -= 0.5 * size; }
+        if (dy > size * 0.5) { dy -= 0.5 * size; }
+        if (dx < -size * 0.5) { dx += 0.5 * size; }
+        if (dy < -size * 0.5) { dy += 0.5 * size; }
         return Math.sqrt(dx * dx + dy * dy);
     }
 
