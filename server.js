@@ -33,7 +33,7 @@ var initializeClient = function (request) {
     cs.send(cindex, 'spawned', m.state());
 
     var initialVelocity = 1;
-    var mindex = m.addAgent([0, Math.random() * 100], [30, 30]);
+    var mindex = m.addAgent([0, Math.random() * 100], [10, 10]);
 
     assert.equal(cindex, mindex, 'indices from connections and model must agree');
 
@@ -72,6 +72,8 @@ wsServer.on('request', function(request) {
 setInterval(function () {
 
     m.integrateSystem();
-    cs.broadcast('existing', m.state());
+    cs.broadcastFunc('viewport', function (i) {
+        return m.stateInEnvironmentOf(i);
+    });
 
-}, 100);
+}, 30);

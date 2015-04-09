@@ -10,24 +10,22 @@ var range = function (n) {
 
 module.exports = function () {
 
-    // var positions = [];
     var x = [];
     var y = [];
-    // var velocities = [];
+
     var vx = [];
     var vy = [];
 
     var dt = 1;
     var size = 800;
+    var cutoffRadius = 300;
 
 
     var addAgent = function (position, velocity) {
         var newIndex = x.length;
 
-        //positions[newIndex] = position
         x[newIndex] = position[0];
         y[newIndex] = position[1];
-        //velocities[newIndex] = velocity;
         vx[newIndex] = velocity[0];
         vy[newIndex] = velocity[1];
 
@@ -54,20 +52,39 @@ module.exports = function () {
     var state = function () {
         return {
             ids: range(x.length),
-            //positions: positions,
-            x: x,
-            y: y,
-            //velocities: velocities
-            vx: vx,
-            vy: vy
+            x: x, y: y,
+            vx: vx, vy: vy
         }
+    }
+
+    var distance = function (i, j) {
+        var dx = x[j] - x[i],
+            dy = y[j] - y[i];
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    var stateInEnvironmentOf = function (index) {
+        var ids = [], hx = [], hy = [], hvx = [], hvy = [], found = 0;
+
+        for (var i = 0;  i < x.length; i++) {
+            if (distance(i, index) < cutoffRadius) {
+                ids[found] = i;
+                hx[found] = x[i]; hy[found] = y[i];
+                hvx[found] = vx[i]; hvy[found] = vy[i];
+                found++;
+            }
+        }
+
+        return {
+            ids: ids,
+            x: hx, y: hy,
+            vx: hvx, vy: hvy
+        };
     }
 
     var stateOf = function (index) {
         return {
             ids : [index],
-            //positions: [positions[index]],
-            //velocities: [velocities[index]]
             x: [x[index]],
             y: [y[index]],
             vx: [vx[index]],
@@ -80,6 +97,7 @@ module.exports = function () {
         accelerateAgent: accelerateAgent,
         integrateSystem: integrateSystem,
         state: state,
+        stateInEnvironmentOf: stateInEnvironmentOf,
         stateOf: stateOf
     }
 }

@@ -1,8 +1,16 @@
 var modelBuilder = function (textContainer, svgContainer) {
 
+    var existingAgents = [];
+
+
     var drawAgents = {
         'spawned': function (data) { workWithAgent(newAgent, data) },
-        'existing': function (data) { workWithAgent(updateAgent, data); }
+        'viewport': function (data) {
+            var toberemoved = removedAgents(data.ids);
+            R.map(function (id) { removeAgent(id); }, toberemoved);
+            workWithAgent(maybeNewAgent, data);
+            existingAgents = data.ids;
+        }
     };
 
 
@@ -25,15 +33,40 @@ var modelBuilder = function (textContainer, svgContainer) {
 
 
     var newAgent = function (name, x, y, vx, vy) {
-        var agent = svg.setScaling(svg.arrow({ 'id': name }), 100);
+        var agent = svg.setScaling(svg.arrow({ 'id': name,
+                                               'fill': 'green',
+                                               'stroke': 'white',
+                                               'stroke-width': 0.01}), 100);
         setAgent(agent, x, y, vx, vy);
         svgContainer.appendChild(agent);
+        existingAgents.push(name);
     };
 
+    var maybeNewAgent = function (name, x, y, vx, vy) {
+        if (existAgent(name)) { updateAgent(name, x, y, vx, vy); }
+        else { newAgent(name, x, y, vx, vy); }
+    };
+
+    var existAgent = function (name) { return inList(existingAgents, name); }
+
+    var inList = function (ll, l) {
+        return R.any(function (i) { return l === i; }, ll);
+    }
+
+    var removedAgents = function (names) {
+        return R.filter(function (name) {
+            return !inList(names, name);
+        }, existingAgents);
+    };
 
     var updateAgent = function (name, x, y, vx, vy) {
         var agent = document.getElementById(name);
         setAgent(agent, x, y, vx, vy);
+    };
+
+    var removeAgent = function (name) {
+        var agent = document.getElementById(name);
+        svg.remove(agent);
     };
 
     return {

@@ -13,7 +13,7 @@ var configureConnection = function (connection, drawAgents, onerror) {
     connection.onmessage = function (message) {
 
         // the following messages from the server are allowed are allowed
-        var messageTypes = ['spawned', 'existing'];
+        var messageTypes = ['spawned', 'viewport'];
 
         try { var json = JSON.parse(message.data); }
         catch (e) {

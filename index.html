@@ -19,9 +19,6 @@
 
   <body>
     <div id="content"></div>
-    <div>
-      <input type="text" id="input"/>
-    </div>
 
     <script type='text/javascript'>
 
@@ -40,12 +37,17 @@ var initializeWebsocket = function (url) {
 
 var initializeUI = function () {
 
+  var width = 800;
+  var height = 800
+
   var textContainer = document.getElementById('content');
   var svgns = 'http://www.w3.org/2000/svg';
 
   var svgContainer = document.createElementNS(svgns, 'svg');
-  svgContainer.setAttribute('width', 1000);
-  svgContainer.setAttribute('height', 800);
+  svgContainer.setAttribute('width', width);
+  svgContainer.setAttribute('height', height);
+  var background = svg.rectangle(width, height, { fill: '#333333' });
+  svgContainer.appendChild(background);
   textContainer.appendChild(svgContainer);
 
   return modelBuilder(textContainer, svgContainer);
@@ -78,7 +80,6 @@ var uiBuilder = initializeUI()
     var sendAcceleration = function (acceleration) {
       if (keyTimer !== undefined) { return; }
       keyTimer = setInterval(function () {
-        console.log(acceleration);
         connection.send(acceleration + ''); 
       }, 30)
     }

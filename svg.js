@@ -18,6 +18,9 @@ var SVG = function () {
     };
 
 
+    var remove = function (elem) { elem.parentNode.removeChild(elem); };
+
+
     var inspectAll = function(elem) {
         var inspection = R.compose(
                 R.fromPairs,
@@ -25,13 +28,23 @@ var SVG = function () {
                     return [node.nodeName, node.nodeValue];
                 }));
         return inspection(elem.attributes);
-    }
+    };
 
 
     var line = function(r1, r2, attrs) {
         var props = {'x1': r1[0], 'x2': r2[0], 'y1': r1[1], 'y2': r2[1]}
         return create('line', R.merge(props, attrs));
     };
+
+
+    var rectangle = function (width, height, attrs) {
+        var props = {
+            x: 0, y: 0,
+            width: width,
+            height: height
+        }
+        return create('rect', R.merge(props, attrs));
+    }
 
 
     var polygon = function(points, attrs) {
@@ -205,18 +218,20 @@ var SVG = function () {
 
     return {
         create: create,
-            update: update,
-            inspect: inspectAll,
-            line: line,
-            polygon: polygon,
-            arrow: arrow,
-            group: group,
-            translate: translate,
-            rotate: rotate,
-            scale: scale,
-            getTransform: getTransform,
-            setRotation: setRotation,
-            setScaling: setScaling,
-            setTranslation: setTranslation
+        remove: remove,
+        update: update,
+        inspect: inspectAll,
+        line: line,
+        polygon: polygon,
+        rectangle: rectangle,
+        arrow: arrow,
+        group: group,
+        translate: translate,
+        rotate: rotate,
+        scale: scale,
+        getTransform: getTransform,
+        setRotation: setRotation,
+        setScaling: setScaling,
+        setTranslation: setTranslation
     };
 };
