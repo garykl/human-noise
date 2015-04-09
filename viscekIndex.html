@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+
+    <meta charset="utf-8">
+    <title>WebSockets - Simple chat</title>
+
+    <!-- external libraries -->
+    <script src='ramda.js' type='text/javascript'></script>
+    <script src='svg.js' type='text/javascript'></script>
+
+    <!-- convert model to visualization -->
+    <script src='realize.js' type='text/javascript'></script>
+    <!-- prepare websocket connections behavior -->
+    <script src="client.js" type='text/javascript'></script>
+    <!-- interface the message sending to the server for humans and viscek clients -->
+    <script src="accelerationSender.js" type='text/javascript'></script>
+
+  </head>
+
+  <body>
+    <div id="content"></div>
+
+    <script type='text/javascript'>
+
+
+var initializeWebsocket = function (url) {
+  window.WebSocket = window.WebSocket || window.MozWebSocket;
+  if (!window.WebSocket) {
+    content.innerHTML = '<p>Sorry, but your browser doesn\'t support WebSockets.';
+    return undefined;
+  }
+
+  websocket = new WebSocket(url);
+  return websocket;
+}
+
+
+var initializeUI = function () {
+
+  var width = 800;
+  var height = 800
+
+  var textContainer = document.getElementById('content');
+  var svgns = 'http://www.w3.org/2000/svg';
+
+  var svgContainer = document.createElementNS(svgns, 'svg');
+  svgContainer.setAttribute('width', width);
+  svgContainer.setAttribute('height', height);
+  var background = svg.rectangle(width, height, { fill: '#333333' });
+  svgContainer.appendChild(background);
+  textContainer.appendChild(svgContainer);
+
+  return modelBuilder(textContainer, svgContainer);
+
+};
+
+// include graphics library
+var svg = SVG();
+
+// prepare UI
+var uiBuilder = initializeUI();
+
+// start websocket
+var connection = initializeWebsocket('ws://127.0.0.1:1337');
+
+
+var currentIds = [];
+var currentX = [];
+var currentY = [];
+var currentVx = [];
+var currentVy = [];
+var viscekCallback = function (index, json) {
+  var messageTypes = ['spawned', 'viewport'];
+  if (json.viewport !== undefined) {
+    currentIds = json['viewport'].ids;
+    currentX = json['viewport'].x;
+    currentY = json['viewport'].y;
+    currentVx = json['viewport'].vx;
+    currentVy = json['viewport'].vy;
+  }
+
+  R.map(function (mt) {
+    if (json[mt] !== undefined) { uiBuilder.drawAgents[mt]( function () {
+          return indexFromCindex(index);
+        }, json[mt]); }
+  }, messageTypes)
+
+}
+var indexFromCindex = function (cindix) {
+  for (var i = 0; i < currentIds.length; i++) {
+    if (cindix === currentIds[i]) {
+      return i;
+    }
+  }
+}
+
+
+// connect the ui with the socket
+var checkoutIndex = configureConnection(
+    connection, viscekCallback, uiBuilder.onerror);
+
+var stopSending = accelerationSenderViszekAgent(connection);
+
+    </script>
+  </body>
+
+</html>

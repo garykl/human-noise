@@ -18,9 +18,9 @@ var accelerationSenderViszekAgent = function (conn) {
 
       // rotate accordingly
       if (angular > 0) {
-        conn.send(-0.01);
+        conn.send(-0.06);
       } else if (angular < 0) {
-        conn.send(0.01);
+        conn.send(0.06);
       }
     }
 

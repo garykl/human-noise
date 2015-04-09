@@ -1,14 +1,27 @@
 var modelBuilder = function (textContainer, svgContainer) {
 
     var existingAgents = [];
+    var width = svgContainer.getAttribute('width');
+    var height = svgContainer.getAttribute('height');
 
 
     var drawAgents = {
-        'spawned': function (data) { workWithAgent(newAgent, data) },
-        'viewport': function (data) {
+        'spawned': function (getIndex, data) { workWithAgent(newAgent, data) },
+        'viewport': function (getIndex, data) {
             var toberemoved = removedAgents(data.ids);
             R.map(function (id) { removeAgent(id); }, toberemoved);
-            workWithAgent(maybeNewAgent, data);
+
+            var number = data.ids.length;
+            var currentIndex = getIndex();
+            if (currentIndex !== undefined) {
+                for (var i = 0; i < number; i++) {
+                    maybeNewAgent(data.ids[i],
+                                  data.x[i] - data.x[currentIndex] + 0.5 * width,
+                                  data.y[i] - data.y[currentIndex] + 0.5 * height,
+                                  data.vx[i],
+                                  data.vy[i]);
+                }
+            }
             existingAgents = data.ids;
         }
     };

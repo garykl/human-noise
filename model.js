@@ -63,10 +63,10 @@ module.exports = function () {
     var distance = function (i, j) {
         var dx = x[j] - x[i],
             dy = y[j] - y[i];
-        if (dx > size * 0.5) { dx -= 0.5 * size; }
-        if (dy > size * 0.5) { dy -= 0.5 * size; }
-        if (dx < -size * 0.5) { dx += 0.5 * size; }
-        if (dy < -size * 0.5) { dy += 0.5 * size; }
+        if (dx > size * 0.5) { dx = 0.5 * size - dx; }
+        if (dy > size * 0.5) { dy = 0.5 * size - dy; }
+        if (dx < -size * 0.5) { dx = 0.5 * size + dx; }
+        if (dy < -size * 0.5) { dy = 0.5 * size + dy; }
         return Math.sqrt(dx * dx + dy * dy);
     }
 

@@ -24,7 +24,7 @@ var configureConnection = function (connection, messageCallback, onerror) {
             console.log(json);
             cindex = json.index;
         }
-        else { messageCallback(json); }
+        else { messageCallback(cindex, json); }
     };
 
 
