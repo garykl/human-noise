@@ -59,13 +59,12 @@ wsServer.on('request', function(request) {
 
     connection.on('message', function(message) {
 
-        console.log('client ' + clientIndex + ' sends ' + message.utf8Data);
+        var data;
+        if (message.type === 'utf8') { data = JSON.parse(message.utf8Data); }
+        else { return; }
 
-        if (message.type === 'utf8') {
-
-            var acceleration = Number(message.utf8Data);
-            m.accelerateAgent(clientIndex, acceleration);
-
+        if (data.acceleration !== undefined) {
+            m.accelerateAgent(clientIndex, data.acceleration);
         }
 
     });

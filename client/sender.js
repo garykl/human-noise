@@ -1,3 +1,37 @@
+var timer = function (func, period) {
+    // a timer can be started, and every `period` millisecond,
+    // `func` is called with the specified argument.
+    // Once a timer is running, it can not be started again, unless it was
+    // stopped previously.
+
+    var threadNumber = undefined;
+
+    var start = function (args) {
+        if (threadNumber === undefined) {
+            threadNumber = setInterval(function () {
+                func(args);
+            }, period);
+        }
+    };
+
+    var stop = function () {
+        if (threadNumber !== undefined) {
+            clearInterval(threadNumber);
+            threadNumber = undefined;
+        }
+    };
+
+    return {
+        start: start,
+        stop: stop
+    };
+}
+
+
+var sendToConnection = function (connection, obj) {
+    connection.send(JSON.stringify(obj));
+}
+
 var sender = {
     //: this module contains functions of the following type
     //: WebSocket -> Net (Net ());
@@ -29,9 +63,9 @@ var sender = {
 
                 // rotate accordingly
                 if (angular > 0.1) {
-                    conn.send(-0.05);
+                    sendToConnection(conn, {'acceleration': -0.05});
                 } else if (angular < -0.1) {
-                    conn.send(0.05);
+                    sendToConnection(conn, {'acceleration': 0.05});
                 }
             }
 
@@ -44,21 +78,12 @@ var sender = {
     // send messages as user
     human: function (conn) {
 
-        var keyTimer = undefined;
+        var accelerationTimer = timer(function (acceleration) {
+            sendToConnection(conn, {'acceleration': acceleration});
+        }, 30);
 
-        var clearLoop = function () {
-            if (keyTimer !== undefined) {
-                clearInterval(keyTimer);
-                keyTimer = undefined;
-            }
-        };
-
-        var sendAcceleration = function (acceleration) {
-            if (keyTimer !== undefined) { return; }
-            keyTimer = setInterval(function () {
-                conn.send(acceleration + ''); 
-            }, 30)
-        };
+        var sendAcceleration = function (acc) { accelerationTimer.start(acc); }
+        var stopSending = function () { accelerationTimer.stop(); }
 
         document.onkeydown = function(e) {
 
@@ -70,16 +95,16 @@ var sender = {
         };
 
         document.onkeyup = function (e) {
-            clearLoop();
+            stopSending();
         };
 
-        var stopSending = function () {
+        var stopUI = function () {
             document.onkeydown = undefined;
             document.onkeyup = undefined;
-            clearLoop;
+            stopSending;
         };
 
-        return stopSending;
+        return stopUI;
     }
 
 };
