@@ -27,8 +27,8 @@ module.exports = function () {
         }
     };
 
-    var send = function (index, name, object) {
-        clients[index].sendUTF(serializeNamedObject(name, object));
+    var send = function (cindex, name, object) {
+        clients[findIndex(cindex)].sendUTF(serializeNamedObject(name, object));
     };
 
     var addConnection = function (cindex, connection) {

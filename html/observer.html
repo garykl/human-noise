@@ -73,19 +73,8 @@ var currentState = state();
 
 // connect the ui with the socket
 var checkoutIndex = configureConnection(
-    connection, viewportCallback(currentState), uiBuilder.onerror);
+    connection, viewportSaveStateCallback(currentState), uiBuilder.onerror);
 
-var stopSending = sender.viscekAgent(
-
-    function () {
-      return currentState.getStateFromServerIndex(checkoutIndex());
-    },
-
-    function () {
-      return currentState.getState();
-    },
-
-    connection);
 
     </script>
   </body>

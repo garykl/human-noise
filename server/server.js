@@ -13,6 +13,7 @@ var intitialVelocity = 1;
 var m = model();
 var actorSockets = conns();
 var viewportObservers = conns();
+var sceneObservers = conns();
 
 
 // set up server //////////////////////////////////////////////////
@@ -38,28 +39,23 @@ var initializeClient = function (request) {
     var cindex = nextIndex;
     nextIndex++;
     var connection = request.accept(null, request.origin);
-    actorSockets.addConnection(cindex, connection);
-    viewportObservers.addConnection(cindex, connection);
-
-    // the order is very important (next three lines)
-    actorSockets.send(cindex, 'index', cindex);
 
     var initialVelocity = 1;
     var mindex = m.addAgent(cindex,
                             [0, Math.random() * 400],
                             [10 * (1 - Math.random()), 10 * (1 - Math.random())]);
 
-    return cindex;
+    return [cindex, connection];
 }
 
 
 wsServer.on('request', function(request) {
 
-    var clientIndex = initializeClient(request);
-    console.log('start socket ' + clientIndex);
-    var connection = actorSockets.at(clientIndex);
+    var h = initializeClient(request);
+    var clientIndex = h[0];
+    var connection = h[1];
+    var type = undefined;
 
-    actorSockets.send(clientIndex, 'message', clientIndex + '');
 
     connection.on('message', function(message) {
 
@@ -67,8 +63,37 @@ wsServer.on('request', function(request) {
         if (message.type === 'utf8') { data = JSON.parse(message.utf8Data); }
         else { return; }
 
-        if (data.acceleration !== undefined) {
-            m.accelerateAgent(clientIndex, data.acceleration);
+
+        //// handshake //////////////////////////////
+        if (data.type !== undefined) {
+
+            if (data.type === 'viewport') {
+                viewportObservers.addConnection(clientIndex, connection);
+                viewportObservers.send(clientIndex, 'index', clientIndex + '');
+            }
+
+            else if (data.type === 'actor') {
+                actorSockets.addConnection(clientIndex, connection);
+                actorSockets.send(clientIndex, 'index', clientIndex + '');
+            }
+
+            else if (data.type === 'scene') {
+                sceneObservers.addConnection(clientIndex, connection);
+            }
+
+            type = data.type;
+        }
+        //// handshake //////////////////////////////
+
+
+        if (type !== undefined) {
+
+            if (type === 'actor') {
+                if (data.acceleration !== undefined) {
+                    m.accelerateAgent(clientIndex, data.acceleration);
+                }
+            }
+
         }
 
     });
