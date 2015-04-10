@@ -9,16 +9,30 @@ var modelBuilder = function (size, textContainer, svgContainer) {
         var toberemoved = removedAgents(data.ids);
         R.map(function (id) { removeAgent(id); }, toberemoved);
 
-        var number = data.ids.length;
-
         if (index !== undefined) {
-            for (var i = 0; i < number; i++) {
+            for (var i = 0; i < data.ids.length; i++) {
                 maybeNewAgent(data.ids[i],
                         data.x[i] + 0.5 * size,
                         data.y[i] + 0.5 * size,
                         data.vx[i],
                         data.vy[i]);
             }
+        }
+        existingAgents = data.ids;
+    };
+
+
+    var drawScene = function (data) {
+
+        var toberemoved = removedAgents(data.ids);
+        R.map(function (id) { removeAgent(id); }, toberemoved);
+
+        for (var i = 0; i < data.ids.length; i++) {
+            maybeNewAgent(data.ids[i],
+                    data.x[i] + 150,
+                    data.y[i] + 150,
+                    data.vx[i],
+                    data.vy[i]);
         }
         existingAgents = data.ids;
     };
@@ -83,6 +97,7 @@ var modelBuilder = function (size, textContainer, svgContainer) {
 
     return {
         drawAgents: drawAgents,
+        drawScene: drawScene,
         onerror: onerror
     }
 

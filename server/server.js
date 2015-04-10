@@ -40,10 +40,6 @@ var initializeClient = function (request) {
     nextIndex++;
     var connection = request.accept(null, request.origin);
 
-    var initialVelocity = 1;
-    var mindex = m.addAgent(cindex,
-                            [0, Math.random() * 400],
-                            [10 * (1 - Math.random()), 10 * (1 - Math.random())]);
 
     return [cindex, connection];
 }
@@ -75,6 +71,9 @@ wsServer.on('request', function(request) {
             else if (data.type === 'actor') {
                 actorSockets.addConnection(clientIndex, connection);
                 actorSockets.send(clientIndex, 'index', clientIndex + '');
+                m.addAgent(clientIndex,
+                           [0, Math.random() * 400],
+                           [10 * (1 - Math.random()), 10 * (1 - Math.random())]);
             }
 
             else if (data.type === 'scene') {
@@ -106,10 +105,18 @@ wsServer.on('request', function(request) {
 
 // integrate the system and send data to clients regularly
 setInterval(function () {
-
     m.integrateSystem();
+}, 40);
+
+setInterval(function () {
     viewportObservers.broadcastFunc('viewport', function (i) {
         return m.stateInEnvironmentOf(i);
     });
 
-}, 30);
+}, 40);
+
+
+// integrate the system and send data to clients regularly
+setInterval(function () {
+    sceneObservers.broadcast('scene', m.state());
+}, 40);

@@ -47,7 +47,6 @@ var configureObjectiveConnection = function (connection, messageCallback, onerro
     // onerror: function without arguments
     //
     // setup the connection and start a responiveness checking loop.
-    var cindex;
 
     connection.onopen = function () {
         sendToConnection(connection, {'type': 'scene'});
@@ -63,9 +62,7 @@ var configureObjectiveConnection = function (connection, messageCallback, onerro
             return;
         }
 
-
-        if (json.index !== undefined) { cindex = Number(json.index); }
-        else { messageCallback(json); }
+        messageCallback(json); 
     };
 
 
@@ -76,8 +73,6 @@ var configureObjectiveConnection = function (connection, messageCallback, onerro
             }
         }, 3000);
     }
-
-    return function () { return cindex; };
 
 };
 

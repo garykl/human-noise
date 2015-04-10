@@ -23,7 +23,7 @@ module.exports = function () {
         //
         // produces the data from `factory` for each client and send.
         for (var i = 0; i < clients.length; i++) {
-            send(i, name, factory(ids[i]));
+            send(ids[i], name, factory(ids[i]));
         }
     };
 
@@ -34,7 +34,6 @@ module.exports = function () {
     var addConnection = function (cindex, connection) {
         var clientIndex = clients.push(connection) - 1;
         ids.push(cindex);
-        console.log(ids);
         return clientIndex;
     };
 
@@ -48,7 +47,6 @@ module.exports = function () {
     };
 
     var at = function (cindex) {
-        console.log(cindex, findIndex(cindex));
         return clients[findIndex(cindex)];
     };
 

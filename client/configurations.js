@@ -20,4 +20,10 @@ var viewportStateSaveCallback = function (state) {
 
 
 var sceneDrawCallback = function (state, uiBuilder) {
-}
+    return function (json) {
+        if (json.scene !== undefined) {
+            state.set(json.scene);
+            uiBuilder.drawScene(json.scene);
+        }
+    };
+};
