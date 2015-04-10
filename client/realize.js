@@ -5,16 +5,15 @@ var modelBuilder = function (size, textContainer, svgContainer) {
 
 
     var drawAgents = {
-        'spawned': function (getIndex, data) { workWithAgent(newAgent, data) },
-        'viewport': function (getIndex, data) {
+        'spawned': function (index, data) { workWithAgent(newAgent, data) },
+        'viewport': function (index, data) {
 
             var toberemoved = removedAgents(data.ids);
             R.map(function (id) { removeAgent(id); }, toberemoved);
 
             var number = data.ids.length;
-            var currentIndex = getIndex();
 
-            if (currentIndex !== undefined) {
+            if (index !== undefined) {
                 for (var i = 0; i < number; i++) {
                     maybeNewAgent(data.ids[i],
                                   data.x[i] + 0.5 * size,

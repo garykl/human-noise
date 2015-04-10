@@ -1,6 +1,6 @@
 var configureConnection = function (connection, messageCallback, onerror) {
     // connection: object returned by 'new WebSocket'.
-    // drawAgent: a dictionary/object with keys in 'messageType' and values
+    // messageCallback: a dictionary/object with keys in 'messageType' and values
     //            being function that takes one argument (JSON object)
     // onerror: function without arguments
     //
