@@ -39,7 +39,9 @@ var modelBuilder = function (size, textContainer, svgContainer) {
 
 
     var setAgent = function (agent, x, y, vx, vy) {
-        var angle = Math.atan2(vy, vx) * 180 / Math.PI + 360;
+        var angle = Math.atan2(vy, vx) * 180 / Math.PI;
+        if (angle < 0) { angle += 360; }
+        if (angle > 360) { angle -= 360; }
         svg.setRotation(agent, angle);
         svg.setTranslation(agent, [x, y]);
     };

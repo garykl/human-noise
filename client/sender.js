@@ -32,13 +32,13 @@ var sender = {
 
                 // rotate accordingly
                 if (angular > 0.1) {
-                    conn.send(-0.2);
+                    conn.send(-0.05);
                 } else if (angular < -0.1) {
-                    conn.send(0.2);
+                    conn.send(0.05);
                 }
             }
 
-        }, 100);
+        }, 40);
 
         return function () { clearInterval(threadKey); };
     },
