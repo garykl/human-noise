@@ -1,17 +1,20 @@
 
-var viewportCallback = function (index, json) {
+var viewportCallback = function (state) {
+    return function (index, json) {
 
-  if (json.viewport !== undefined) {
-    currentState.set(json.viewport);
-    uiBuilder.drawAgents(index, json.viewport);
-  }
-
+        if (json.viewport !== undefined) {
+            state.set(json.viewport);
+            uiBuilder.drawAgents(index, json.viewport);
+        }
+    }
 };
 
 
 // potentially usefull for viscek spawner ui
-var viewportStateSaveCallback = function (index, json) {
-    if (json.viewport !== undefined) {
-        currentState.set(json.viewport);
+var viewportStateSaveCallback = function (state) {
+    function (index, json) {
+        if (json.viewport !== undefined) {
+            state.set(json.viewport);
+        }
     }
 };

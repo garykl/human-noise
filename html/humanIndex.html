@@ -73,7 +73,7 @@ var connection = initializeWebsocket('ws://127.0.0.1:1337');
 var currentState = state();
 
 // convert server message to state and ui
-configureConnection(connection, viewportCallback, uiBuilder.onerror);
+configureConnection(connection, viewportCallback(currentState), uiBuilder.onerror);
 
 // convert ui to messages to the server
 var stopSending = sender.human(connection);
