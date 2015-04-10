@@ -11,7 +11,8 @@ var portnumber = 1337;
 var intitialVelocity = 1;
 
 var m = model();
-var agentSockets = conns();
+var actorSockets = conns();
+var viewportObservers = conns();
 
 
 // set up server //////////////////////////////////////////////////
@@ -30,12 +31,18 @@ var wsServer = setupServer(portnumber);
 
 
 
+nextIndex = 0;
+
 var initializeClient = function (request) {
 
-    var cindex = agentSockets.addConnection(request);
+    var cindex = nextIndex;
+    nextIndex++;
+    var connection = request.accept(null, request.origin);
+    actorSockets.addConnection(cindex, connection);
+    viewportObservers.addConnection(cindex, connection);
 
     // the order is very important (next three lines)
-    agentSockets.send(cindex, 'index', cindex);
+    actorSockets.send(cindex, 'index', cindex);
 
     var initialVelocity = 1;
     var mindex = m.addAgent(cindex,
@@ -43,7 +50,7 @@ var initializeClient = function (request) {
                             [10 * (1 - Math.random()), 10 * (1 - Math.random())]);
 
     // all other clients need to know about the new agent, too
-    agentSockets.broadcast('spawned', m.stateOf(cindex));
+    actorSockets.broadcast('spawned', m.stateOf(cindex));
 
     return cindex;
 }
@@ -53,9 +60,9 @@ wsServer.on('request', function(request) {
 
     var clientIndex = initializeClient(request);
     console.log('start socket ' + clientIndex);
-    var connection = agentSockets.at(clientIndex);
+    var connection = actorSockets.at(clientIndex);
 
-    agentSockets.send(clientIndex, 'message', clientIndex + '');
+    actorSockets.send(clientIndex, 'message', clientIndex + '');
 
     connection.on('message', function(message) {
 
@@ -79,7 +86,7 @@ wsServer.on('request', function(request) {
 setInterval(function () {
 
     m.integrateSystem();
-    agentSockets.broadcastFunc('viewport', function (i) {
+    viewportObservers.broadcastFunc('viewport', function (i) {
         return m.stateInEnvironmentOf(i);
     });
 

@@ -31,10 +31,9 @@ module.exports = function () {
         clients[index].sendUTF(serializeNamedObject(name, object));
     };
 
-    var addConnection = function (request) {
-        var connection = request.accept(null, request.origin);
+    var addConnection = function (cindex, connection) {
         var clientIndex = clients.push(connection) - 1;
-        ids.push(clientIndex);
+        ids.push(cindex);
         console.log(ids);
         return clientIndex;
     };
