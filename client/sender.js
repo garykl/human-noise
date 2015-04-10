@@ -18,9 +18,7 @@ var sender = {
             // the following cross product.
 
             // client's angle
-            console.log('inside viscekAgent');
             var state = getState();
-            console.log(state);
             var fullState = getFullState();
             if (state !== undefined) {
 
@@ -28,7 +26,6 @@ var sender = {
                 var ysum = R.reduce(R.add, 0, fullState.vy) - state.vy;
 
                 var angular = ysum * state.vx - xsum * state.vy;
-                console.log(angular);
 
                 // rotate accordingly
                 if (angular > 0.1) {

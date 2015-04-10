@@ -10,6 +10,8 @@ var range = function (n) {
 
 module.exports = function () {
 
+    var ids= [];
+
     var x = [];
     var y = [];
 
@@ -21,9 +23,10 @@ module.exports = function () {
     var cutoffRadius = 300;
 
 
-    var addAgent = function (position, velocity) {
+    var addAgent = function (cindex, position, velocity) {
         var newIndex = x.length;
 
+        ids[newIndex] = cindex;
         x[newIndex] = position[0];
         y[newIndex] = position[1];
         vx[newIndex] = velocity[0];
@@ -32,7 +35,17 @@ module.exports = function () {
         return newIndex;
     };
 
-    var accelerateAgent = function (index, acceleration) {
+    var findIndex = function (cindex) {
+        //: AgentIndex -> Maybe Integer
+        // given the the index of agentSockets, return the model index
+        for (var i = 0; i < ids.length; i++) {
+            if (cindex === ids[i]) { return i; }
+        }
+        return undefined;
+    }
+
+    var accelerateAgent = function (cindex, acceleration) {
+        var index = findIndex(cindex);
         // consider only changes in the direction, velocity is rotated.
         var angle = acceleration * dt;
         var t_vx = Math.cos(angle) * vx[index] + Math.sin(angle) * vy[index];
@@ -54,21 +67,17 @@ module.exports = function () {
 
     var state = function () {
         return {
-            ids: range(x.length),
+            ids: ids,
             x: x, y: y,
             vx: vx, vy: vy
         }
     }
 
-    var distance = function (i, j) {
-        var h = relativeCoordinate(i, j),
-            dx = h[0], dy = h[1];
-        return Math.sqrt(dx * dx + dy * dy);
-    }
-
-    var relativeCoordinate = function (i, j) {
+    var relativeCoordinate = function (ci, cj) {
         // returns the relative vector of j with respect to i,
         // considering periodicity.
+        var i = findIndex(ci);
+        var j = findIndex(cj);
         var u = x[j] - x[i], v = y[j] - y[i];
         if (u > size * 0.5) { u -= size; }
         if (v > size * 0.5) { v -= size; }
@@ -77,19 +86,27 @@ module.exports = function () {
         return [u, v];
     }
 
-    var stateInEnvironmentOf = function (index) {
+    var distance = function (ci, cj) {
+        // AgentIndex -> AgentIndex
+        var h = relativeCoordinate(ci, cj),
+            dx = h[0], dy = h[1];
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    var stateInEnvironmentOf = function (cindex) {
+        //: AgentIndex -> State
         // return the state of agent `index`'s environment in relative
         // coordinates
-        var ids = [], hx = [], hy = [], hvx = [], hvy = [], found = 0;
+        var hids = [], hx = [], hy = [], hvx = [], hvy = [], found = 0;
 
         for (var i = 0;  i < x.length; i++) {
             var h;
 
-            if (distance(i, index) < cutoffRadius) {
+            if (distance(ids[i], cindex) < cutoffRadius) {
 
-                ids[found] = i;
+                hids[found] = ids[i];
 
-                h = relativeCoordinate(index, i);
+                h = relativeCoordinate(cindex, ids[i]);
                 hx[found] = h[0]; hy[found] = h[1];
 
                 hvx[found] = vx[i]; hvy[found] = vy[i];
@@ -98,15 +115,16 @@ module.exports = function () {
         }
 
         return {
-            ids: ids,
+            ids: hids,
             x: hx, y: hy,
             vx: hvx, vy: hvy
         };
     }
 
-    var stateOf = function (index) {
+    var stateOf = function (cindex) {
+        index = findIndex(cindex);
         return {
-            ids : [index],
+            ids : [cindex],
             x: [x[index]],
             y: [y[index]],
             vx: [vx[index]],

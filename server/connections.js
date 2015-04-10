@@ -1,6 +1,7 @@
 module.exports = function () {
 
     var clients = [];
+    var ids = [];
 
     var broadcastString = function (string) {
         for (var i = 0; i < clients.length; i++) { clients[i].sendUTF(string); }
@@ -22,7 +23,7 @@ module.exports = function () {
         //
         // produces the data from `factory` for each client and send.
         for (var i = 0; i < clients.length; i++) {
-            send(i, name, factory(i));
+            send(i, name, factory(ids[i]));
         }
     };
 
@@ -33,11 +34,23 @@ module.exports = function () {
     var addConnection = function (request) {
         var connection = request.accept(null, request.origin);
         var clientIndex = clients.push(connection) - 1;
+        ids.push(clientIndex);
+        console.log(ids);
         return clientIndex;
     };
 
-    var at = function (index) {
-        return clients[index];
+    var findIndex = function (cindex) {
+        //: AgentIndex -> Maybe Integer
+        // given the the index of agentSockets, return the model index
+        for (var i = 0; i < ids.length; i++) {
+            if (cindex === ids[i]) { return i; }
+        }
+        return undefined;
+    };
+
+    var at = function (cindex) {
+        console.log(cindex, findIndex(cindex));
+        return clients[findIndex(cindex)];
     };
 
     return {

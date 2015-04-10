@@ -91,7 +91,6 @@ var checkoutIndex = configureConnection(
 var stopSending = sender.viscekAgent(
 
     function () {
-      console.log(checkoutIndex());
       return currentState.getStateFromServerIndex(checkoutIndex());
     },
 
