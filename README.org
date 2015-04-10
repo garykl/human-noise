@@ -1,9 +1,16 @@
+* What?
+hybrid swarms
+
 * dependencies
 
 ** node.js
 
 - websocket
 
+from inside the =server= folder, execute =npm install=
+
 ** client
 
 - ramda
+
+create a symbolic link or copy a version of =ramda.js= in the =client= folder
