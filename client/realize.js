@@ -4,25 +4,23 @@ var modelBuilder = function (size, textContainer, svgContainer) {
     var size = size;
 
 
-    var drawAgents = {
-        'viewport': function (index, data) {
+    var drawAgents = function (index, data) {
 
-            var toberemoved = removedAgents(data.ids);
-            R.map(function (id) { removeAgent(id); }, toberemoved);
+        var toberemoved = removedAgents(data.ids);
+        R.map(function (id) { removeAgent(id); }, toberemoved);
 
-            var number = data.ids.length;
+        var number = data.ids.length;
 
-            if (index !== undefined) {
-                for (var i = 0; i < number; i++) {
-                    maybeNewAgent(data.ids[i],
-                                  data.x[i] + 0.5 * size,
-                                  data.y[i] + 0.5 * size,
-                                  data.vx[i],
-                                  data.vy[i]);
-                }
+        if (index !== undefined) {
+            for (var i = 0; i < number; i++) {
+                maybeNewAgent(data.ids[i],
+                        data.x[i] + 0.5 * size,
+                        data.y[i] + 0.5 * size,
+                        data.vx[i],
+                        data.vy[i]);
             }
-            existingAgents = data.ids;
         }
+        existingAgents = data.ids;
     };
 
 

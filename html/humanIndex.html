@@ -15,7 +15,11 @@
     <!-- prepare websocket connections behavior -->
     <script src="../client/client.js" type='text/javascript'></script>
     <!-- message sending interface to the server for humans and viscek clients -->
-    <script src="../client/sender.js" type='text/javascript'>
+    <script src="../client/sender.js" type='text/javascript'></script>
+    <!-- a structure for saving the state and interfacing with it -->
+    <script src="../client/state.js" type='text/javascript'></script>
+    <!-- collection of callback functions for use in configureConnection -->
+    <script src="../client/configurations.js" type='text/javascript'></script>
     </script>
 
   </head>
@@ -65,47 +69,13 @@ var uiBuilder = initializeUI();
 // start websocket
 var connection = initializeWebsocket('ws://127.0.0.1:1337');
 
+// initialize state
+var currentState = state();
 
-var currentIds = [];
-var currentX = [];
-var currentY = [];
-var currentVx = [];
-var currentVy = [];
-var indexFromCindex = function (cindix) {
-  for (var i = 0; i < currentIds.length; i++) {
-    if (cindix === currentIds[i]) {
-      return i;
-    }
-  }
-}
+// convert server message to state and ui
+configureConnection(connection, viewportCallback, uiBuilder.onerror);
 
-
-
-var humanCallback = function (index, json) {
-
-  var messageTypes = ['spawned', 'viewport'];
-
-  if (json.viewport !== undefined) {
-    currentIds = json['viewport'].ids;
-    currentX = json['viewport'].x;
-    currentY = json['viewport'].y;
-    currentVx = json['viewport'].vx;
-    currentVy = json['viewport'].vy;
-  }
-
-  R.map(function (mt) {
-    if (json[mt] !== undefined) { uiBuilder.drawAgents[mt]( function () {
-          return indexFromCindex(index);
-        }, json[mt]); }
-  }, messageTypes)
-
-};
-
-
-// connect the ui with the socket
-configureConnection(connection, humanCallback, uiBuilder.onerror);
-
-
+// convert ui to messages to the server
 var stopSending = sender.human(connection);
 
     </script>
