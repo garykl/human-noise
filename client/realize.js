@@ -5,7 +5,6 @@ var modelBuilder = function (size, textContainer, svgContainer) {
 
 
     var drawAgents = {
-        'spawned': function (index, data) { workWithAgent(newAgent, data) },
         'viewport': function (index, data) {
 
             var toberemoved = removedAgents(data.ids);

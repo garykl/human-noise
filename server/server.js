@@ -49,9 +49,6 @@ var initializeClient = function (request) {
                             [0, Math.random() * 400],
                             [10 * (1 - Math.random()), 10 * (1 - Math.random())]);
 
-    // all other clients need to know about the new agent, too
-    actorSockets.broadcast('spawned', m.stateOf(cindex));
-
     return cindex;
 }
 
