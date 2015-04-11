@@ -14,15 +14,15 @@
     <script src='../client/utils.js' type='text/javascript'></script>
 
     <!-- convert model to visualization -->
-    <script src='../client/realize.js' type='text/javascript'></script>
+    <script src='../client/modelbuilder.js' type='text/javascript'></script>
     <!-- prepare websocket connections behavior -->
     <script src="../client/client.js" type='text/javascript'></script>
     <!-- interface the message sending to the server for humans and viscek clients -->
     <script src="../client/sender.js" type='text/javascript'></script>
     <!-- a structure for saving the state and interfacing with it -->
     <script src="../client/state.js" type='text/javascript'></script>
-    <!-- collection of callback functions for use in configureConnection -->
-    <script src="../client/configurations.js" type='text/javascript'></script>
+    <!-- collection of callback functions for use in client -->
+    <script src="../client/configuration.js" type='text/javascript'></script>
 
   </head>
 
@@ -80,9 +80,9 @@ var spawnViscekAgent = function () {
   var currentState = state();
 
   // connect the ui with the socket
-  var checkoutIndex = configureSubjectiveConnection(
+  var checkoutIndex = client.subjectiveConnection(
       connection,
-      viewportStateSaveCallback(currentState),
+      configuration.saveViewport(currentState),
       uiBuilder.onerror);
 
   var stopSending = sender.viscekAgent(
@@ -106,9 +106,9 @@ var observe = function () {
   var currentState = state();
 
   // connect the ui with the socket
-  configureObjectiveConnection(
+  client.objectiveConnection(
       connection,
-      sceneDrawCallback(currentState, uiBuilder),
+      configuration.drawScene(currentState, uiBuilder),
       uiBuilder.onerror);
 }
 

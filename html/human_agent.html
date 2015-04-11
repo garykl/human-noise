@@ -14,15 +14,15 @@
     <script src='../client/utils.js' type='text/javascript'></script>
 
     <!-- convert model to visualization -->
-    <script src='../client/realize.js' type='text/javascript'></script>
+    <script src='../client/modelbuilder.js' type='text/javascript'></script>
     <!-- prepare websocket connections behavior -->
     <script src="../client/client.js" type='text/javascript'></script>
     <!-- message sending interface to the server for humans and viscek clients -->
     <script src="../client/sender.js" type='text/javascript'></script>
     <!-- a structure for saving the state and interfacing with it -->
     <script src="../client/state.js" type='text/javascript'></script>
-    <!-- collection of callback functions for use in configureConnection -->
-    <script src="../client/configurations.js" type='text/javascript'></script>
+    <!-- collection of callback functions for use in client -->
+    <script src="../client/configuration.js" type='text/javascript'></script>
     </script>
 
   </head>
@@ -76,9 +76,9 @@ var connection = initializeWebsocket('ws://127.0.0.1:1337');
 var currentState = state();
 
 // convert server message to state and ui
-configureSubjectiveConnection(
+client.subjectiveConnection(
     connection,
-    viewportCallback(currentState, uiBuilder),
+    configuration.drawViewport(currentState, uiBuilder),
     uiBuilder.onerror);
 
 // convert ui to messages to the server
