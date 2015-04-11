@@ -30,4 +30,5 @@ var helpers = {
         return modelBuilder(size, textContainer, svgContainer);
 
     }
+
 };
