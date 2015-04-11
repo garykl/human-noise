@@ -28,6 +28,10 @@
 
   <body>
     <div id="content"></div>
+    <div>
+      <button id='spawn'>Spawn!</button>
+      <input type="text" id="number" value="1" />
+    </div>
 
     <script type='text/javascript'>
 
@@ -46,7 +50,7 @@ var initializeWebsocket = function (url) {
 
 var initializeUI = function () {
 
-  var size = 1000;
+  var size = 900;
 
   var textContainer = document.getElementById('content');
   var svgns = 'http://www.w3.org/2000/svg';
@@ -69,17 +73,56 @@ var svg = SVG();
 var uiBuilder = initializeUI();
 
 // start websocket
-var connection = initializeWebsocket('ws://127.0.0.1:1337');
+var spawnViscekAgent = function () {
 
-var currentState = state();
+  var connection = initializeWebsocket('ws://127.0.0.1:1337');
+
+  var currentState = state();
+
+  // connect the ui with the socket
+  var checkoutIndex = configureSubjectiveConnection(
+      connection,
+      viewportStateSaveCallback(currentState),
+      uiBuilder.onerror);
+
+  var stopSending = sender.viscekAgent(
+
+      function () {
+        return currentState.getStateFromServerIndex(checkoutIndex());
+      },
+
+      function () {
+        return currentState.getState();
+      },
+
+      connection);
+};
 
 
-// connect the ui with the socket
-configureObjectiveConnection(
-    connection,
-    sceneDrawCallback(currentState, uiBuilder),
-    uiBuilder.onerror);
+var observe = function () {
 
+  var connection = initializeWebsocket('ws://127.0.0.1:1337');
+
+  var currentState = state();
+
+  // connect the ui with the socket
+  configureObjectiveConnection(
+      connection,
+      sceneDrawCallback(currentState, uiBuilder),
+      uiBuilder.onerror);
+}
+
+
+observe();
+document.getElementById('spawn').onclick = function () {
+  var num;
+  try { num = Number(document.getElementById('number').value); }
+  catch (e) { num = 1; }
+
+  for (var i = 0; i < num; i++) {
+    spawnViscekAgent();
+  }
+}
 
     </script>
   </body>
