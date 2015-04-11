@@ -12,6 +12,8 @@ var sender = {
         //: (-> FullState) -> WebSocket -> Net ()
         // getState: may return the state of the client.
         // getFullState: returns the state of all clients.
+        var consciousAngular = 0.05;
+        var angularNoise = 0.2;
 
         var stopSending = simpleTimer(function () {
             // for viscek in this form, we need the acceleration. No need for the actual
@@ -29,10 +31,16 @@ var sender = {
                 var angular = ysum * state.vx - xsum * state.vy;
 
                 // rotate accordingly
-                if (angular > 0.1) {
-                    sendToConnection(conn, {'acceleration': -0.05});
-                } else if (angular < -0.1) {
-                    sendToConnection(conn, {'acceleration': 0.05});
+                var randomAngular = angularNoise * (1 - 2 * Math.random());
+                if (angular > 0) {
+                    sendToConnection(conn,
+                            {'acceleration': -consciousAngular + randomAngular});
+                } else if (angular < 0) {
+                    sendToConnection(conn,
+                            {'acceleration': consciousAngular + randomAngular});
+                } else {
+                    sendToConnection(conn,
+                            {'acceleration': randomAngular});
                 }
             }
 

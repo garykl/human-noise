@@ -9,9 +9,12 @@ var utils = require('../share/utils');
 process.title = 'swarming';
 var portnumber = 1337;
 
-var intitialVelocity = 1;
+var fieldsize = 1500;
+var sensingDistance = 200;
+var m = model(fieldsize, sensingDistance);
 
-var m = model();
+// put all the connections into the following containers, depending on what the
+// client wants to hear or say.
 var actorSockets = conns();
 var viewportObservers = conns();
 var sceneObservers = conns();
@@ -66,19 +69,31 @@ wsServer.on('request', function(request) {
 
             if (data.type === 'viewport') {
                 viewportObservers.add(clientIndex, connection);
-                viewportObservers.send(clientIndex, 'index', clientIndex + '');
+                viewportObservers.send(clientIndex,
+                        'index', clientIndex + '');
+                // the viewport observers need to know the sensing distance
+                viewportObservers.send(clientIndex,
+                        'sensing', sensingDistance);
             }
 
             else if (data.type === 'actor') {
                 actorSockets.add(clientIndex, connection);
                 actorSockets.send(clientIndex, 'index', clientIndex + '');
+                var initialVelocity = 10;
+                var vx = 10 * (0.5 - Math.random());
+                var vy = 10 * (0.5 - Math.random());
+                var vl = Math.sqrt(vx * vx + vy * vy);
+                vx = vx / vl * initialVelocity;
+                vy = vy / vl * initialVelocity;
                 m.add(clientIndex,
-                      [0, Math.random() * 400],
-                      [10 * (1 - Math.random()), 10 * (1 - Math.random())]);
+                      [0, 0],
+                      [vx, vy]);
             }
 
             else if (data.type === 'scene') {
                 sceneObservers.add(clientIndex, connection);
+                // the scene observer needs to know the size of the field
+                sceneObservers.send(clientIndex, 'fieldsize', fieldsize);
             }
 
             type = data.type;

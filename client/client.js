@@ -7,6 +7,7 @@ var client = {
         //
         // setup the connection and start a responiveness checking loop.
         var cindex;
+        var sensingDistance;
 
         connection.onopen = function () {
             sendToConnection(connection, {'type': 'viewport'});
@@ -25,8 +26,22 @@ var client = {
             }
 
 
-            if (json.index !== undefined) { cindex = Number(json.index); }
-            else { messageCallback(cindex, json); }
+            // client index, saved at the server, corresponding to this agent,
+            if (json.index !== undefined) {
+                cindex = Number(json.index);
+            }
+
+            // sensing distance, useful for dynamically create ui sizes.
+            else if (json.sensing !== undefined) {
+                sensingDistance = Number(json.sensing);
+            }
+
+            // only when the information is complete, start reacting on the state
+            else if (json.viewport !== undefined) {
+                if (sensingDistance !== undefined && cindex !== undefined) {
+                    messageCallback(cindex, json.viewport);
+                }
+            }
         };
 
 
@@ -50,6 +65,8 @@ var client = {
         //
         // setup the connection and start a responiveness checking loop.
 
+        var fieldsize;
+
         connection.onopen = function () {
             sendToConnection(connection, {'type': 'scene'});
         };
@@ -64,7 +81,20 @@ var client = {
                 return;
             }
 
-            messageCallback(json); 
+
+            // size of the simulation box
+            if (json.fieldsize !== undefined) {
+                fieldsize = Number(json.fieldsize);
+            }
+
+            // only when the information is complete, start reacting on the state
+            else if (json.scene !== undefined) {
+
+                if (fieldsize !== undefined) {
+                    messageCallback(json.scene);
+                }
+            }
+
         };
 
 

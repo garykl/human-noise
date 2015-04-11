@@ -8,7 +8,7 @@ var range = function (n) {
 }
 
 
-module.exports = function () {
+module.exports = function (size, sensingDistance) {
 
     var ids= [];
 
@@ -19,8 +19,8 @@ module.exports = function () {
     var vy = [];
 
     var dt = 1;
-    var size = 800;
-    var cutoffRadius = 300;
+    var size = size;
+    var cutoffRadius = sensingDistance;
 
 
     var addAgent = function (cindex, position, velocity) {

@@ -12,6 +12,12 @@ var helpers = {
         return websocket;
     },
 
+    rectangularBackground: function (svg, size) {
+        svg.setAttribute('width', size);
+        svg.setAttribute('height', size);
+        var background = svg.rectangle(size, size, { fill: '#333333' });
+        svg.appendChild(background);
+    },
 
     initializeUI: function () {
 
@@ -25,6 +31,7 @@ var helpers = {
         svgContainer.setAttribute('height', size);
         var background = svg.rectangle(size, size, { fill: '#333333' });
         svgContainer.appendChild(background);
+
         textContainer.appendChild(svgContainer);
 
         return modelBuilder(size, textContainer, svgContainer);
