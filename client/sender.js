@@ -13,7 +13,7 @@ var sender = {
         // getState: may return the state of the client.
         // getFullState: returns the state of all clients.
 
-        var threadKey = setInterval(function () {
+        var stopSending = simpleTimer(function () {
             // for viscek in this form, we need the acceleration. No need for the actual
             // angles. Acceleration of velocity is a short angular velocity, given by
             // the following cross product.
@@ -38,7 +38,7 @@ var sender = {
 
         }, 40);
 
-        return function () { clearInterval(threadKey); };
+        return stopSending;
     },
 
 

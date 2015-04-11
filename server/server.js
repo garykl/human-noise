@@ -3,6 +3,7 @@ var http = require('http');
 var assert = require('assert');
 var model = require('./model');
 var conns = require('./connections');
+var utils = require('../share/utils');
 
 "use strict";
 process.title = 'swarming';
@@ -103,20 +104,22 @@ wsServer.on('request', function(request) {
 });
 
 
-// integrate the system and send data to clients regularly
-setInterval(function () {
-    m.integrateSystem();
-}, 40);
+var integrationPeriod = 40;
+var viewportPeriod = 40;
+var scenePeriod = 40;
 
-setInterval(function () {
+// integrate the system
+var stopIntegrating = utils.simpleTimer(
+        function () { m.integrateSystem(); }, integrationPeriod);
+
+// send data to clients regularly
+var stopViewportSending = utils.simpleTimer(function () {
     viewportObservers.broadcastFunc('viewport', function (i) {
         return m.stateInEnvironmentOf(i);
     });
-
-}, 40);
-
+}, viewportPeriod);
 
 // integrate the system and send data to clients regularly
-setInterval(function () {
+var stopSceneSending = utils.simpleTimer(function () {
     sceneObservers.broadcast('scene', m.state());
-}, 40);
+}, scenePeriod);

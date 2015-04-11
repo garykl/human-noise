@@ -31,7 +31,7 @@ var client = {
 
 
         if (connection !== undefined) {
-            setInterval(function() {
+            var stopChecking = simpleTimer(function() {
                 if (connection.readyState !== 1) {
                     onerror();
                 }
@@ -69,7 +69,7 @@ var client = {
 
 
         if (connection !== undefined) {
-            setInterval(function() {
+            var stopChecking = simpleTimer(function() {
                 if (connection.readyState !== 1) {
                     onerror();
                 }
