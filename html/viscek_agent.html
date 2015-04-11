@@ -29,57 +29,31 @@
   <body>
     <div id="content"></div>
 
+    <!-- dirty helper functions that use the html dom tree -->
+    <script type='text/javascript' src='helpers.js'></script>
     <script type='text/javascript'>
 
-
-var initializeWebsocket = function (url) {
-  window.WebSocket = window.WebSocket || window.MozWebSocket;
-  if (!window.WebSocket) {
-    content.innerHTML = '<p>Sorry, but your browser doesn\'t support WebSockets.';
-    return undefined;
-  }
-
-  websocket = new WebSocket(url);
-  return websocket;
-}
-
-
-var initializeUI = function () {
-
-  var size = 600;
-
-  var textContainer = document.getElementById('content');
-  var svgns = 'http://www.w3.org/2000/svg';
-
-  var svgContainer = document.createElementNS(svgns, 'svg');
-  svgContainer.setAttribute('width', size);
-  svgContainer.setAttribute('height', size);
-  var background = svg.rectangle(size, size, { fill: '#333333' });
-  svgContainer.appendChild(background);
-  textContainer.appendChild(svgContainer);
-
-  return modelBuilder(size, textContainer, svgContainer);
-
-};
 
 // include graphics library
 var svg = SVG();
 
 // prepare UI
-var uiBuilder = initializeUI();
+var uiBuilder = helpers.initializeUI();
 
 // start websocket
-var connection = initializeWebsocket('ws://127.0.0.1:1337');
+var connection = helpers.initializeWebsocket('ws://127.0.0.1:1337');
 
+// initialize state
 var currentState = state();
 
 
-// connect the ui with the socket
+// establish a connection, and set the rules for saving and interpreting data
 var checkoutIndex = client.subjectiveConnection(
     connection,
     configuration.drawViewport(currentState, uiBuilder),
     uiBuilder.onerror);
 
+// start the message sending loop
 var stopSending = sender.viscekAgent(
 
     function () {
