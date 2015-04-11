@@ -35,6 +35,19 @@ module.exports = function () {
         return newIndex;
     };
 
+    var remove = function (cindex) {
+        // check if a client given by its index exist and remove it
+        var index = findIndex(cindex);
+        if (index !== undefined) {
+            ids.splice(index, 1);
+            x.splice(index, 1);
+            y.splice(index, 1);
+            vx.splice(index, 1);
+            vy.splice(index, 1);
+        }
+    }
+
+
     var findIndex = function (cindex) {
         //: AgentIndex -> Maybe Integer
         // given the the index of agentSockets, return the model index
@@ -133,7 +146,8 @@ module.exports = function () {
     }
 
     return {
-        addAgent: addAgent,
+        add: addAgent,
+        remove: remove,
         accelerateAgent: accelerateAgent,
         integrateSystem: integrateSystem,
         state: state,

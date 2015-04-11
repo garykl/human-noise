@@ -65,20 +65,20 @@ wsServer.on('request', function(request) {
         if (data.type !== undefined) {
 
             if (data.type === 'viewport') {
-                viewportObservers.addConnection(clientIndex, connection);
+                viewportObservers.add(clientIndex, connection);
                 viewportObservers.send(clientIndex, 'index', clientIndex + '');
             }
 
             else if (data.type === 'actor') {
-                actorSockets.addConnection(clientIndex, connection);
+                actorSockets.add(clientIndex, connection);
                 actorSockets.send(clientIndex, 'index', clientIndex + '');
-                m.addAgent(clientIndex,
-                           [0, Math.random() * 400],
-                           [10 * (1 - Math.random()), 10 * (1 - Math.random())]);
+                m.add(clientIndex,
+                      [0, Math.random() * 400],
+                      [10 * (1 - Math.random()), 10 * (1 - Math.random())]);
             }
 
             else if (data.type === 'scene') {
-                sceneObservers.addConnection(clientIndex, connection);
+                sceneObservers.add(clientIndex, connection);
             }
 
             type = data.type;
@@ -99,7 +99,13 @@ wsServer.on('request', function(request) {
     });
 
     // user disconnected
-    connection.on('close', function(connection) {});
+    connection.on('close', function(connection) {
+        // remove agent from model and various connections
+        m.remove(clientIndex);
+        actorSockets.remove(clientIndex);
+        viewportObservers.remove(clientIndex);
+        sceneObservers.remove(clientIndex);
+    });
 
 });
 
