@@ -29,10 +29,10 @@ var modelBuilder = function (size, textContainer, svgContainer) {
 
         for (var i = 0; i < data.ids.length; i++) {
             maybeNewAgent(data.ids[i],
-                    data.x[i] + 150,
-                    data.y[i] + 150,
+                    0.3 * data.x[i] + 50,
+                    0.3 * data.y[i] + 50,
                     data.vx[i],
-                    data.vy[i]);
+                    data.vy[i], 30);
         }
         existingAgents = data.ids;
     };
@@ -58,19 +58,20 @@ var modelBuilder = function (size, textContainer, svgContainer) {
     };
 
 
-    var newAgent = function (name, x, y, vx, vy) {
+    var newAgent = function (name, x, y, vx, vy, scaling) {
+        if (scaling === undefined) { scaling = 80; }
         var agent = svg.setScaling(svg.arrow({ 'id': name,
                                                'fill': 'green',
                                                'stroke': 'white',
-                                               'stroke-width': 0.01}), 100);
+                                               'stroke-width': 0.01}), scaling);
         setAgent(agent, x, y, vx, vy);
         svgContainer.appendChild(agent);
         existingAgents.push(name);
     };
 
-    var maybeNewAgent = function (name, x, y, vx, vy) {
+    var maybeNewAgent = function (name, x, y, vx, vy, scaling) {
         if (existAgent(name)) { updateAgent(name, x, y, vx, vy); }
-        else { newAgent(name, x, y, vx, vy); }
+        else { newAgent(name, x, y, vx, vy, scaling); }
     };
 
     var existAgent = function (name) { return inList(existingAgents, name); }
