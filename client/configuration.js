@@ -17,9 +17,9 @@ var configuration = {
 
 
     drawScene: function (state, uiBuilder) {
-        return function (json) {
+        return function (json, fieldsize) {
             state.set(json);
-            uiBuilder.drawScene(json);
+            uiBuilder.drawScene(json, fieldsize);
         };
     }
 

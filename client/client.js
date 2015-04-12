@@ -91,7 +91,7 @@ var client = {
             else if (json.scene !== undefined) {
 
                 if (fieldsize !== undefined) {
-                    messageCallback(json.scene);
+                    messageCallback(json.scene, fieldsize);
                 }
             }
 

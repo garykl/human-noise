@@ -1,3 +1,4 @@
+var utils = require('../share/utils');
 
 var range = function (n) {
     var res = [];
@@ -51,10 +52,7 @@ module.exports = function (size, sensingDistance) {
     var findIndex = function (cindex) {
         //: AgentIndex -> Maybe Integer
         // given the the index of agentSockets, return the model index
-        for (var i = 0; i < ids.length; i++) {
-            if (cindex === ids[i]) { return i; }
-        }
-        return undefined;
+        return utils.findIndex(ids, cindex);
     }
 
     var accelerateAgent = function (cindex, acceleration) {
@@ -111,6 +109,8 @@ module.exports = function (size, sensingDistance) {
         // return the state of agent `index`'s environment in relative
         // coordinates
         var hids = [], hx = [], hy = [], hvx = [], hvy = [], found = 0;
+        var cx = x[findIndex(cindex)];
+        var cy = y[findIndex(cindex)];
 
         for (var i = 0;  i < x.length; i++) {
             var h;
@@ -120,7 +120,8 @@ module.exports = function (size, sensingDistance) {
                 hids[found] = ids[i];
 
                 h = relativeCoordinate(cindex, ids[i]);
-                hx[found] = h[0]; hy[found] = h[1];
+                hx[found] = cx + h[0];
+                hy[found] = cy + h[1];
 
                 hvx[found] = vx[i]; hvy[found] = vy[i];
                 found++;

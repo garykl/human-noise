@@ -1,3 +1,5 @@
+var utils = require('../share/utils');
+
 module.exports = function () {
 
     var clients = [];
@@ -49,10 +51,7 @@ module.exports = function () {
     var findIndex = function (cindex) {
         //: AgentIndex -> Maybe Integer
         // given the the index of agentSockets, return the model index
-        for (var i = 0; i < ids.length; i++) {
-            if (cindex === ids[i]) { return i; }
-        }
-        return undefined;
+        return utils.findIndex(ids, cindex);
     };
 
     var at = function (cindex) {

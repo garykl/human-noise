@@ -30,6 +30,10 @@ var SVG = function () {
         return inspection(elem.attributes);
     };
 
+    var point = function(x, y, attrs) {
+        var props = {'cx': x, 'cy': y, 'r': 2};
+        return create('circle', R.merge(props, attrs));
+    }
 
     var line = function(r1, r2, attrs) {
         var props = {'x1': r1[0], 'x2': r2[0], 'y1': r1[1], 'y2': r2[1]}
@@ -221,10 +225,13 @@ var SVG = function () {
         remove: remove,
         update: update,
         inspect: inspectAll,
+
         line: line,
         polygon: polygon,
         rectangle: rectangle,
         arrow: arrow,
+        point: point,
+
         group: group,
         translate: translate,
         rotate: rotate,

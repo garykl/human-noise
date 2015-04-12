@@ -53,10 +53,30 @@ var simpleTimer = function (callback, period) {
 };
 
 
+var findIndex = function (list, value) {
+    //: [a] -> a -> Maybe a
+    // return the index of the first occurence of value in list.
+    // return undefined if value is not in list.
+    for (var i = 0; i < list.length; i++) {
+        if (value === list[i]) { return i; }
+    }
+    return undefined;
+}
+
+
+var range = function (start, step, high) {
+    return R.unfold(function (n) {
+        if (n <= high) { return [n, n + step]; }
+        else { return false; }
+    }, start);
+}
+
+
 // make module usable to node.js
 if (typeof exports == 'object' && exports) {
 
     exports.timer = timer;
     exports.simpleTimer = simpleTimer;
+    exports.findIndex = findIndex;
 
 }

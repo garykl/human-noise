@@ -2,35 +2,87 @@ var modelBuilder = function (size, textContainer, svgContainer) {
 
     var existingAgents = [];
     var size = size;
+    var pointsDrawn = false;
+    var agentsize = 100;
+
+    var drawPoints = function (x, y, x0, y0) {
+
+        // var points;
+        if (!pointsDrawn) {
+
+            points = R.map(function (i) {
+
+                var point = svg.point(0, 0, {
+                    id: 'point' + i,
+                    fill: '#7799ee'
+                })
+                svgContainer.appendChild(point);
+                return point;
+
+            }, R.range(0, x.length * y.length));
+
+            pointsDrawn = true;
+        }
+        else {
+            points = R.map(function (i) {
+                return document.getElementById('point' + i);
+            }, R.range(0, x.length * y.length));
+        }
+
+        R.map(function (p) {
+
+            var x = p[1][0] - x0
+                var y = p[1][1] - y0
+                svg.setTranslation(p[0], [x, y]);
+
+        }, R.zip(points, R.xprod(x, y)));
+    };
 
 
     var drawAgents = function (index, data) {
+        // draw some points as indicator for movement:
+        // points being coordinates around the agent.
+        var x = data.x[findIndex(data.ids, index)];
+        var y = data.y[findIndex(data.ids, index)];
+        x -= x % agentsize - 0.5 * size;
+        y -= y % agentsize - 0.5 * size;
+
+        var pointnumber = 11;
+        var dr = (pointnumber - 1) / 2 * agentsize;
+        var xx = range(x - dr, agentsize, x + dr);
+        var yy = range(y - dr, agentsize, y + dr);
+        drawPoints(xx, yy,
+                data.x[findIndex(data.ids, index)],
+                data.y[findIndex(data.ids, index)]);
+
 
         var toberemoved = removedAgents(data.ids);
         R.map(function (id) { removeAgent(id); }, toberemoved);
 
+        var cx = data.x[findIndex(data.ids, index)]
+        var cy = data.y[findIndex(data.ids, index)]
         if (index !== undefined) {
             for (var i = 0; i < data.ids.length; i++) {
                 maybeNewAgent(data.ids[i],
-                        data.x[i] + 0.5 * size,
-                        data.y[i] + 0.5 * size,
+                        data.x[i] - cx + 0.5 * size,
+                        data.y[i] - cy + 0.5 * size,
                         data.vx[i],
-                        data.vy[i]);
+                        data.vy[i], agentsize);
             }
         }
         existingAgents = data.ids;
     };
 
 
-    var drawScene = function (data) {
+    var drawScene = function (data, fieldsize) {
 
         var toberemoved = removedAgents(data.ids);
         R.map(function (id) { removeAgent(id); }, toberemoved);
 
         for (var i = 0; i < data.ids.length; i++) {
             maybeNewAgent(data.ids[i],
-                    0.3 * data.x[i] + 50,
-                    0.3 * data.y[i] + 50,
+                    size / (fieldsize + 100) * data.x[i] + 15,
+                    size / (fieldsize + 100) * data.y[i] + 15,
                     data.vx[i],
                     data.vy[i], 30);
         }
@@ -100,6 +152,6 @@ var modelBuilder = function (size, textContainer, svgContainer) {
         drawAgents: drawAgents,
         drawScene: drawScene,
         onerror: onerror
-    }
+    };
 
 }
