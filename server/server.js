@@ -4,6 +4,8 @@ var assert = require('assert');
 var model = require('./model');
 var conns = require('./connections');
 var utils = require('../share/utils');
+var fs = require ('fs');
+
 
 "use strict";
 process.title = 'swarming';
@@ -19,14 +21,33 @@ var actorSockets = conns();
 var viewportObservers = conns();
 var sceneObservers = conns();
 
-
 // set up server //////////////////////////////////////////////////
 var setupServer = function (portnumber) {
     //: Integer -> WebsocketServer
-    var server = http.createServer(function(request, response) {});
+    //
+    var server = http.createServer(function(request, response) {
+
+        var clientRegexp = /\/client\//;
+        var htmlRegexp = /\/html\//;
+        var shareRegexp = /\/share\//;
+
+        if (clientRegexp.test(request.url)
+         || htmlRegexp.test(request.url)
+         || shareRegexp.test(request.url)) {
+            console.log(__dirname + '/..' + request.url);
+            fs.readFile(__dirname + '/..' + request.url, function (err, data) {
+                if (err) { response.end('that route does not exist'); }
+                response.writeHeader(200, {"Content-Type": "text/html"});
+                response.end(data);
+            });
+        }
+
+    });
+
     server.listen(portnumber, function() {
         console.log((new Date()) + " Server is listening on port " + portnumber);
     });
+
     var wsserver = new webSocketServer({ httpServer: server });
     return wsserver;
 };
