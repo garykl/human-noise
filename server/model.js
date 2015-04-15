@@ -46,14 +46,14 @@ module.exports = function (size, sensingDistance) {
             vx.splice(index, 1);
             vy.splice(index, 1);
         }
-    }
+    };
 
 
     var findIndex = function (cindex) {
         //: AgentIndex -> Maybe Integer
         // given the the index of agentSockets, return the model index
         return utils.findIndex(ids, cindex);
-    }
+    };
 
     var accelerateAgent = function (cindex, acceleration) {
         var index = findIndex(cindex);
@@ -82,7 +82,7 @@ module.exports = function (size, sensingDistance) {
             x: x, y: y,
             vx: vx, vy: vy
         }
-    }
+    };
 
     var relativeCoordinate = function (ci, cj) {
         // returns the relative vector of j with respect to i,
@@ -95,14 +95,14 @@ module.exports = function (size, sensingDistance) {
         if (u < -size * 0.5) { u += size; }
         if (v < -size * 0.5) { v += size; }
         return [u, v];
-    }
+    };
 
     var distance = function (ci, cj) {
         // AgentIndex -> AgentIndex
         var h = relativeCoordinate(ci, cj),
             dx = h[0], dy = h[1];
         return Math.sqrt(dx * dx + dy * dy);
-    }
+    };
 
     var stateInEnvironmentOf = function (cindex) {
         //: AgentIndex -> State
@@ -133,7 +133,7 @@ module.exports = function (size, sensingDistance) {
             x: hx, y: hy,
             vx: hvx, vy: hvy
         };
-    }
+    };
 
     var stateOf = function (cindex) {
         index = findIndex(cindex);
@@ -144,7 +144,16 @@ module.exports = function (size, sensingDistance) {
             vx: [vx[index]],
             vy: [vy[index]]
         }
-    }
+    };
+
+    var stateAsMatrix = function () {
+        var res = '';
+        for (var i = 0; i < ids.length; i++) {
+            res += ids[i] + ' ' + x[i] + ' ' + y[i] + ' ';
+            res += vx[i] + ' ' + vy[i] + '\n';
+        }
+        return res;
+    };
 
     return {
         add: addAgent,
@@ -153,6 +162,7 @@ module.exports = function (size, sensingDistance) {
         integrateSystem: integrateSystem,
         state: state,
         stateInEnvironmentOf: stateInEnvironmentOf,
-        stateOf: stateOf
-    }
+        stateOf: stateOf,
+        stateAsMatrix: stateAsMatrix
+    };
 }

@@ -1,3 +1,4 @@
+var fs = require('fs');
 var assert = require('assert');
 var model = require('./model');
 var conns = require('./connections');
@@ -20,6 +21,7 @@ var m = model(fieldsize, sensingDistance);
 var integrationPeriod = 40;
 var viewportPeriod = 40;
 var scenePeriod = 40;
+var dataWritePeriod = 500;
 
 
 // put all the connections into the following containers, depending on what the
@@ -73,8 +75,8 @@ var initializeSceneObserver = function (cindex, socket, size) {
     // add the socket to the sceneObserver distributor and the size to the
     // client
 
-    sceneObservers.add(clientIndex, connection);
-    sceneObservers.send(clientIndex, 'fieldsize', fieldsize);
+    sceneObservers.add(cindex, socket);
+    sceneObservers.send(cindex, 'fieldsize', size);
 };
 
 
@@ -118,7 +120,7 @@ wsServer.on('request', function(request) {
             }
 
             else if (data.type === 'scene') {
-                initializeSceneObserver(clientIndex, connection);
+                initializeSceneObserver(clientIndex, connection, fieldsize);
             }
 
             type = data.type;
@@ -148,13 +150,22 @@ var stopIntegrating = utils.simpleTimer(
         function () { m.integrateSystem(); }, integrationPeriod);
 
 // send data to clients regularly
-var stopViewportSending = utils.simpleTimer(function () {
+var stopSendingViewport = utils.simpleTimer(function () {
     viewportObservers.broadcastFunc('viewport', function (i) {
         return m.stateInEnvironmentOf(i);
     });
 }, viewportPeriod);
 
 // integrate the system and send data to clients regularly
-var stopSceneSending = utils.simpleTimer(function () {
+var stopSendingScene = utils.simpleTimer(function () {
     sceneObservers.broadcast('scene', m.state());
 }, scenePeriod);
+
+// save some data
+var stopWritingData = utils.simpleTimer(function () {
+    var date = new Date();
+    var dataString = m.stateAsMatrix();
+    if (dataString !== '') {
+        fs.writeFile('data/' + date.getTime(), m.stateAsMatrix());
+    }
+}, dataWritePeriod);
