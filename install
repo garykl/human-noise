@@ -6,3 +6,6 @@ npm install
 
 cd ../client
 ln -s ../server/node_modules/ramda/dist/ramda.min.js ramda.js
+
+cd ..
+mkdir data

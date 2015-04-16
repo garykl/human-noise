@@ -1,9 +1,10 @@
 {
   "name": "human-noise",
+  "version": "0.1.0",
   "description": "hide a simulation in a game",
   "author": "Gary Klindt <gary.klindt@googlemail.com>",
   "dependencies": {
-    "websocket": ">1.0.0",
-    "ramda": ">=0.13.0"
+    "websocket": "> 1.0.0",
+    "ramda": ">= 0.13.0"
   }
 }
