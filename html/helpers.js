@@ -36,6 +36,48 @@ var helpers = {
 
         return modelBuilder(size, textContainer, svgContainer);
 
-    }
+    },
 
 };
+
+
+// start websocket
+var spawnViscekAgent = function (url) {
+
+    var connection = helpers.initializeWebsocket(url);
+
+    var currentState = state();
+
+    // connect the ui with the socket
+    var checkoutIndex = client.subjectiveConnection(
+            connection,
+            configuration.saveViewport(currentState),
+            uiBuilder.onerror);
+
+    var stopSending = sender.viscekAgent(
+
+            function () {
+                return currentState.getStateFromServerIndex(checkoutIndex());
+            },
+
+            function () {
+                return currentState.getState();
+            },
+
+            connection);
+};
+
+
+var observe = function (url) {
+
+    var connection = helpers.initializeWebsocket(url);
+
+    var currentState = state();
+
+    // connect the ui with the socket
+    client.objectiveConnection(
+            connection,
+            configuration.drawScene(currentState, uiBuilder),
+            uiBuilder.onerror);
+}
+

@@ -29,10 +29,6 @@
 
   <body>
     <div id="content"></div>
-    <div>
-      <button id='spawn'>Spawn!</button>
-      <input type="text" id="number" value="1" />
-    </div>
 
     <!-- dirty helper functions that use the html dom tree -->
     <script type='text/javascript' src='helpers.js'></script>
@@ -45,16 +41,8 @@ var svg = SVG();
 // prepare UI
 var uiBuilder = helpers.initializeUI();
 
+observe('ws://127.0.0.1:1337');
 
-document.getElementById('spawn').onclick = function () {
-  var num;
-  try { num = Number(document.getElementById('number').value); }
-  catch (e) { num = 1; }
-
-  for (var i = 0; i < num; i++) {
-    spawnViscekAgent('ws://127.0.0.1:1337');
-  }
-}
 
     </script>
   </body>

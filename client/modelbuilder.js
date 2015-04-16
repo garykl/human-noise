@@ -3,7 +3,7 @@ var modelBuilder = function (size, textContainer, svgContainer) {
     var existingAgents = [];
     var size = size;
     var pointsDrawn = false;
-    var agentsize = 100;
+    var agentsize = 5000 / size;
 
     var drawPoints = function (x, y, x0, y0) {
 
@@ -84,7 +84,7 @@ var modelBuilder = function (size, textContainer, svgContainer) {
                     size / (fieldsize + 100) * data.x[i] + 15,
                     size / (fieldsize + 100) * data.y[i] + 15,
                     data.vx[i],
-                    data.vy[i], 30);
+                    data.vy[i], agentsize);
         }
         existingAgents = data.ids;
     };
