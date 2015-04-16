@@ -9,7 +9,7 @@ var range = function (n) {
 }
 
 
-module.exports = function (size, sensingDistance) {
+module.exports = function (size, sensingDistance, noise) {
 
     var ids= [];
 
@@ -22,6 +22,7 @@ module.exports = function (size, sensingDistance) {
     var dt = 1;
     var size = size;
     var cutoffRadius = sensingDistance;
+    var noise = noise;
 
 
     var addAgent = function (cindex, position, velocity) {
@@ -55,21 +56,25 @@ module.exports = function (size, sensingDistance) {
         return utils.findIndex(ids, cindex);
     };
 
-    var accelerateAgent = function (cindex, acceleration) {
-        var index = findIndex(cindex);
-        // consider only changes in the direction, velocity is rotated.
+    var accelerate = function (index, acceleration) {
         var angle = acceleration * dt;
         var t_vx = Math.cos(angle) * vx[index] + Math.sin(angle) * vy[index];
         var t_vy = -Math.sin(angle) * vx[index] + Math.cos(angle) * vy[index];
-        //var vl = Math.sqrt(vx[index] * vx[index] + vy[index] * vy[index]);
-        //vx[index] = vl * Math.cos(orientation);
-        //vy[index] = vl * Math.sin(orientation);
         vx[index] = t_vx;
         vy[index] = t_vy;
     };
 
+    var accelerateAgent = function (cindex, acceleration) {
+        var index = findIndex(cindex);
+        // consider only changes in the direction, velocity is rotated.
+        accelerate(index, acceleration);
+    };
+
     var integrateSystem = function () {
         for (var i = 0; i < x.length; i++) {
+            // add noise
+            var randomAngular = (0.5 - Math.random()) * noise;
+            accelerate(i, randomAngular);
             // consider periodic boundary conditions
             x[i] = (x[i] + vx[i] * dt + size) % size;
             y[i] = (y[i] + vy[i] * dt + size) % size;

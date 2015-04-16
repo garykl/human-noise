@@ -10,11 +10,22 @@ var server = require('./server');
 process.title = 'swarming';
 var portnumber = 1337;
 
+if (process.argv.length !== 5) {
+    console.log('usage: ' + process.argv[0] + ' ' + process.argv[1] +
+                 'L v0 mu');
+    process.exit();
+}
 
-// physics parameters and data
-var fieldsize = 1500;
+// physics parameters as command line arguments // reasonable values
+var sizeRatio = process.argv[2];                // 10
+var initialVelocity = process.argv[3];          // 10
+var angularNoise = process.argv[4];             // 1
+
+
+// feeding the model
 var sensingDistance = 200;
-var m = model(fieldsize, sensingDistance);
+var fieldsize = sensingDistance * sizeRatio;
+var m = model(fieldsize, sensingDistance, angularNoise);
 
 
 // all the periodic stuff is done with certain periods
@@ -55,15 +66,15 @@ var initializeActorSocket = function (cindex, socket) {
     // add the socket to the actorSocket distribution list and send the client
     // identifier to the client.
 
-    var initialVelocity = 10;
-
-    var vx = 10 * (0.5 - Math.random());
-    var vy = 10 * (0.5 - Math.random());
+    var vx = 0.5 - Math.random();
+    var vy = 0.5 - Math.random();
     var vl = Math.sqrt(vx * vx + vy * vy);
     vx = vx / vl * initialVelocity;
     vy = vy / vl * initialVelocity;
+    var x = Math.random() * fieldsize;
+    var y = Math.random() * fieldsize;
 
-    m.add(cindex, [0, 0], [vx, vy]);
+    m.add(cindex, [x, y], [vx, vy]);
 
     actorSockets.add(cindex, socket);
     actorSockets.send(cindex, 'index', cindex);
