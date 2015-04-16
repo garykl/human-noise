@@ -13,7 +13,7 @@ var sender = {
         // getState: may return the state of the client.
         // getFullState: returns the state of all clients.
         var consciousAngular = 0.05;
-        var angularNoise = 0.2;
+        var angularNoise = 0.5;
 
         var stopSending = simpleTimer(function () {
             // for viscek in this form, we need the acceleration. No need for the actual
@@ -25,23 +25,17 @@ var sender = {
             var fullState = getFullState();
             if (state !== undefined) {
 
-                var xsum = R.reduce(R.add, 0, fullState.vx) - state.vx;
-                var ysum = R.reduce(R.add, 0, fullState.vy) - state.vy;
+                var xsum = R.reduce(R.add, 0, fullState.vx);
+                var ysum = R.reduce(R.add, 0, fullState.vy);
+                var sumAng = Math.atan2(ysum, xsum);
+                var vAng = Math.atan2(state.vy, state.vx);
 
-                var angular = ysum * state.vx - xsum * state.vy;
+                var angular = vAng - sumAng;
 
-                // rotate accordingly
                 var randomAngular = angularNoise * (1 - 2 * Math.random());
-                if (angular > 0) {
-                    sendToConnection(conn,
-                            {'acceleration': -consciousAngular + randomAngular});
-                } else if (angular < 0) {
-                    sendToConnection(conn,
-                            {'acceleration': consciousAngular + randomAngular});
-                } else {
-                    sendToConnection(conn,
-                            {'acceleration': randomAngular});
-                }
+
+                sendToConnection(conn,
+                        {'acceleration': angular + randomAngular});
             }
 
         }, 40);
