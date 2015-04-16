@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+
+cd server
+npm install
+
+cd ../client
+ln -s ../server/node_modules/ramda/dist/ramda.min.js
