@@ -1,16 +1,32 @@
-* What?
-hybrid swarms
+* What is it?
 
-* dependencies
+swarm integrator, providing clients that act as agents.
 
-** node.js
+* getting started
 
+** install dependencies
+
+dependencies are:
 - websocket
-
-from inside the =server= folder, execute =npm install=
-
-** client
-
 - ramda
 
-create a symbolic link or copy a version of =ramda.js= in the =client= folder
+and can be installed via =./install.sh=
+
+
+** program execution
+
+*** server
+
+The server should be started from the root directory of this repository.
+
+=node server/main.js <size ratio> <agent velocity> <noise level>=
+
+a =data= folder is then generated and a subfolder with a name, generated from
+the assigned parameters.
+
+*** clients
+
+To interact with the server, open one of the following pages:
+- =localhost:1337/html/human_agent.js=: control an agent.
+- =localhost:1337/html/viscek_spawner.js=: spawn any number of viscek agents.
+- =localhost:1337/html/big_screen.js=: watch the life simulation.
