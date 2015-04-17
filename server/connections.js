@@ -47,7 +47,7 @@ module.exports = function () {
         var index = utils.findIndex(ids, cindex);
         if (index !== undefined) {
             ids.splice(index, 1);
-            clients = R.dissoc(cindex, clients);
+            clients = R.dissoc(cindex + '', clients);
         }
     }
 
