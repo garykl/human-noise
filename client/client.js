@@ -81,7 +81,6 @@ var client = {
                 return;
             }
 
-
             // size of the simulation box
             if (json.fieldsize !== undefined) {
                 fieldsize = Number(json.fieldsize);

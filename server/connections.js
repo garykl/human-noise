@@ -1,12 +1,15 @@
 var utils = require('../share/utils');
+var R = require('ramda');
 
 module.exports = function () {
 
-    var clients = [];
+    var clients = {};
     var ids = [];
 
     var broadcastString = function (string) {
-        for (var i = 0; i < clients.length; i++) { clients[i].sendUTF(string); }
+        for (var i = 0; i < ids.length; i++) {
+            clients[ids[i]].sendUTF(string);
+        }
     };
 
     var serializeNamedObject = function (name, obj) {
@@ -30,32 +33,26 @@ module.exports = function () {
     };
 
     var send = function (cindex, name, object) {
-        clients[findIndex(cindex)].sendUTF(serializeNamedObject(name, object));
+        clients[cindex].sendUTF(serializeNamedObject(name, object));
     };
 
     var addConnection = function (cindex, connection) {
-        var clientIndex = clients.push(connection) - 1;
         ids.push(cindex);
-        return clientIndex;
+        clients[cindex] = connection;
+        return cindex;
     };
 
     var remove = function (cindex) {
         // check if a client given by its index exist and remove it
-        var index = findIndex(cindex);
+        var index = utils.findIndex(ids, cindex);
         if (index !== undefined) {
             ids.splice(index, 1);
-            clients.splice(index, 1);
+            clients = R.dissoc(cindex, clients);
         }
     }
 
-    var findIndex = function (cindex) {
-        //: AgentIndex -> Maybe Integer
-        // given the the index of agentSockets, return the model index
-        return utils.findIndex(ids, cindex);
-    };
-
     var at = function (cindex) {
-        return clients[findIndex(cindex)];
+        return clients[cindex];
     };
 
     return {

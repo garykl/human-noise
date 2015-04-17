@@ -31,7 +31,7 @@ var m = model(fieldsize, sensingDistance, angularNoise);
 // all the periodic stuff is done with certain periods
 var integrationPeriod = 40;
 var viewportPeriod = 40;
-var scenePeriod = 40;
+var scenePeriod = 500;
 var dataWritePeriod = 500;
 
 
