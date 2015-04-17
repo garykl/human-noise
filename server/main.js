@@ -42,6 +42,23 @@ var viewportObservers = conns();
 var sceneObservers = conns();
 
 
+var dataFolderName = function () {
+    return 'L' + sizeRatio + '_' + 'v' + initialVelocity + '_' +
+           'n' + angularNoise + '_' + 'size' + fieldsize;
+}
+
+var createDataFolder = function () {
+    // check for data folder
+    var foldername = dataFolderName();
+    if (!fs.existsSync('data')) {
+        fs.mkdirSync('data');
+    }
+    fs.mkdir('data/' + foldername);
+};
+
+createDataFolder();
+
+
 // set up server
 var wsServer = server.createWebsocketServer(
         server.createHttpServer(portnumber));
@@ -156,9 +173,11 @@ wsServer.on('request', function(request) {
 });
 
 
+
 // integrate the system
 var stopIntegrating = utils.simpleTimer(
         function () { m.integrateSystem(); }, integrationPeriod);
+
 
 // send data to clients regularly
 var stopSendingViewport = utils.simpleTimer(function () {
@@ -167,16 +186,19 @@ var stopSendingViewport = utils.simpleTimer(function () {
     });
 }, viewportPeriod);
 
+
 // integrate the system and send data to clients regularly
 var stopSendingScene = utils.simpleTimer(function () {
     sceneObservers.broadcast('scene', m.state());
 }, scenePeriod);
+
 
 // save some data
 var stopWritingData = utils.simpleTimer(function () {
     var date = new Date();
     var dataString = m.stateAsMatrix();
     if (dataString !== '') {
-        fs.writeFile('data/' + date.getTime(), m.stateAsMatrix());
+        fs.writeFile('data/' + dataFolderName() + '/' +
+                     date.getTime(), m.stateAsMatrix());
     }
 }, dataWritePeriod);
