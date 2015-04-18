@@ -10,6 +10,56 @@ var range = function (n) {
 }
 
 
+var neighborlist = function (size, cutoffRadius) {
+
+    var L = Math.round(size / cutoffRadius);
+    var neighbors = undefined;
+    var ids = undefined;
+
+    var emptyNeighborList = function () {
+        neighbors = [];
+        for (var i = 0; i < L; i++) {
+            neighbors[i] = [];
+            for (var j = 0; j < L; i++) {
+                neighbors[i][j] = [];
+            }
+        }
+        ids = {};
+    };
+
+    var addNeighbor(id, x, y) {
+        // save the id in the appropriate grid element
+        var xp = Math.floor(x / cutoffRadius);
+        var yp = Math.floor(y / cutoffRadius);
+        neighbors[xp][yp] = id;
+        ids[id] = [xp, yp];
+    };
+
+    var potentiallyInteractingWith(id) {
+        // return a list of ids that are potentially interacting with id, i.e.
+        // they are in the same grid element as id or in a surrounding one,
+        // considering periodic boundary conditions.
+        var x = ids[id][0];
+        var y = ids[id][1];
+        var res = [];
+        for (var di = -1; di < 2; di++) {
+            for (var dj = -1; dj < 2; dj++) {
+                var xh = (x + di + L) % L;
+                var yh = (y + dj + L) % L;
+                res.concat(neighbors[xh][yh]);
+            }
+        }
+        return res;
+    };
+
+    return {
+        emptyNeighborList: emptyNeighborList,
+        addNeighbor: addNeighbor,
+        potentiallyInteractingWith: potentiallyInteractingWith
+    };
+};
+
+
 module.exports = function (size, sensingDistance, noise) {
 
     var ids= [];
