@@ -31,7 +31,7 @@ var m = model(fieldsize, sensingDistance, angularNoise);
 // all the periodic stuff is done with certain periods
 var integrationPeriod = 40;
 var viewportPeriod = 40;
-var scenePeriod = 500;
+var scenePeriod = 40;
 var dataWritePeriod = 500;
 
 
@@ -44,8 +44,8 @@ var sceneObservers = conns();
 
 var dataFolderName = function () {
     return 'L' + sizeRatio + '_' + 'v' + initialVelocity + '_' +
-           'n' + angularNoise + '_' + 'size' + fieldsize;
-}
+        'n' + angularNoise + '_' + 'size' + fieldsize;
+};
 
 var createDataFolder = function () {
     // check for data folder
@@ -53,7 +53,9 @@ var createDataFolder = function () {
     if (!fs.existsSync('data')) {
         fs.mkdirSync('data');
     }
-    fs.mkdir('data/' + foldername);
+    if (!fs.existsSync('data/' + foldername)) {
+        fs.mkdirSync('data/' + foldername);
+    }
 };
 
 createDataFolder();
@@ -176,7 +178,11 @@ wsServer.on('request', function(request) {
 
 // integrate the system
 var stopIntegrating = utils.simpleTimer(
-        function () { m.integrateSystem(); }, integrationPeriod);
+        function () {
+            m.updateNeighborList();
+            m.integrateSystem();
+        }, integrationPeriod);
+
 
 
 // send data to clients regularly

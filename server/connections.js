@@ -27,7 +27,7 @@ module.exports = function () {
         // factory: function that takes an index and returns an object
         //
         // produces the data from `factory` for each client and send.
-        for (var i = 0; i < clients.length; i++) {
+        for (var i = 0; i < ids.length; i++) {
             send(ids[i], name, factory(ids[i]));
         }
     };

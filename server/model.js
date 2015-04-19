@@ -12,7 +12,7 @@ var range = function (n) {
 
 var neighborlist = function (size, cutoffRadius) {
 
-    var L = Math.round(size / cutoffRadius);
+    var L = Math.round(size / cutoffRadius)
     var neighbors = undefined;
     var ids = undefined;
 
@@ -20,7 +20,7 @@ var neighborlist = function (size, cutoffRadius) {
         neighbors = [];
         for (var i = 0; i < L; i++) {
             neighbors[i] = [];
-            for (var j = 0; j < L; i++) {
+            for (var j = 0; j < L; j++) {
                 neighbors[i][j] = [];
             }
         }
@@ -31,7 +31,7 @@ var neighborlist = function (size, cutoffRadius) {
         // save the id in the appropriate grid element
         var xp = Math.floor(x / cutoffRadius);
         var yp = Math.floor(y / cutoffRadius);
-        neighbors[xp][yp] = id;
+        neighbors[xp][yp][neighbors[xp][yp].length] = id;
         ids[id] = [xp, yp];
     };
 
@@ -46,7 +46,7 @@ var neighborlist = function (size, cutoffRadius) {
             for (var dj = -1; dj < 2; dj++) {
                 var xh = (x + di + L) % L;
                 var yh = (y + dj + L) % L;
-                res.concat(neighbors[xh][yh]);
+                res = res.concat(neighbors[xh][yh]);
             }
         }
         return res;
@@ -75,6 +75,8 @@ module.exports = function (size, sensingDistance, noise) {
     var cutoffRadius = sensingDistance;
     var noise = noise;
 
+    var neighboring = neighborlist(size, cutoffRadius);
+
 
     var addAgent = function (cindex, position, velocity) {
         var newIndex = ids.length;
@@ -84,6 +86,8 @@ module.exports = function (size, sensingDistance, noise) {
         y[cindex] = position[1];
         vx[cindex] = velocity[0];
         vy[cindex] = velocity[1];
+
+        neighboring.addNeighbor(cindex, position[0], position[1]);
 
         return newIndex;
     };
@@ -108,7 +112,16 @@ module.exports = function (size, sensingDistance, noise) {
         vy[cindex] = t_vy;
     };
 
+    var updateNeighborList = function () {
+        neighboring.emptyNeighborList();
+
+        for (var i = 0; i < ids.length; i++) {
+            neighboring.addNeighbor(ids[i], x[ids[i]], y[ids[i]]);
+        }
+    };
+
     var integrateSystem = function () {
+
         for (var i = 0; i < ids.length; i++) {
             // add noise
             var randomAngular = (0.5 - Math.random()) * noise;
@@ -153,18 +166,21 @@ module.exports = function (size, sensingDistance, noise) {
         var cx = x[cindex];
         var cy = y[cindex];
 
-        for (var i = 0;  i < ids.length; i++) {
+        var pids = neighboring.potentiallyInteractingWith(cindex);
+        // var pids = ids;
+
+        for (var i = 0;  i < pids.length; i++) {
             var h;
 
-            if (distance(ids[i], cindex) < cutoffRadius) {
+            if (distance(pids[i], cindex) < cutoffRadius) {
 
-                hids[found] = ids[i];
+                hids[found] = pids[i];
 
-                h = relativeCoordinate(cindex, ids[i]);
+                h = relativeCoordinate(cindex, pids[i]);
                 hx[found] = cx + h[0];
                 hy[found] = cy + h[1];
 
-                hvx[found] = vx[ids[i]]; hvy[found] = vy[ids[i]];
+                hvx[found] = vx[pids[i]]; hvy[found] = vy[pids[i]];
                 found++;
             }
         }
@@ -201,6 +217,7 @@ module.exports = function (size, sensingDistance, noise) {
         remove: remove,
         accelerateAgent: accelerate,
         integrateSystem: integrateSystem,
+        updateNeighborList: updateNeighborList,
         state: state,
         stateInEnvironmentOf: stateInEnvironmentOf,
         stateOf: stateOf,
