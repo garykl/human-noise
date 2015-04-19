@@ -42,6 +42,8 @@ var modelBuilder = function (size, textContainer, svgContainer) {
     var drawAgents = function (index, data) {
         // draw some points as indicator for movement:
         // points being coordinates around the agent.
+        var agentsize = size / 5;
+
         var x = data.x[findIndex(data.ids, index)];
         var y = data.y[findIndex(data.ids, index)];
         x -= x % agentsize - 0.5 * size;
