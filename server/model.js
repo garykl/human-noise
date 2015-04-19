@@ -27,7 +27,7 @@ var neighborlist = function (size, cutoffRadius) {
         ids = {};
     };
 
-    var addNeighbor(id, x, y) {
+    var addNeighbor = function (id, x, y) {
         // save the id in the appropriate grid element
         var xp = Math.floor(x / cutoffRadius);
         var yp = Math.floor(y / cutoffRadius);
@@ -35,7 +35,7 @@ var neighborlist = function (size, cutoffRadius) {
         ids[id] = [xp, yp];
     };
 
-    var potentiallyInteractingWith(id) {
+    var potentiallyInteractingWith = function (id) {
         // return a list of ids that are potentially interacting with id, i.e.
         // they are in the same grid element as id or in a surrounding one,
         // considering periodic boundary conditions.
