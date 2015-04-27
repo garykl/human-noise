@@ -30,7 +30,7 @@ var m = model(fieldsize, sensingDistance, angularNoise);
 
 // all the periodic stuff is done with certain periods
 var integrationPeriod = 40;
-var viewportPeriod = 40;
+var viewportPeriod = integrationPeriod;
 var scenePeriod = 40;
 var dataWritePeriod = 500;
 
@@ -179,7 +179,6 @@ wsServer.on('request', function(request) {
 // integrate the system
 var stopIntegrating = utils.simpleTimer(
         function () {
-            m.updateNeighborList();
             m.integrateSystem();
         }, integrationPeriod);
 
@@ -187,6 +186,7 @@ var stopIntegrating = utils.simpleTimer(
 
 // send data to clients regularly
 var stopSendingViewport = utils.simpleTimer(function () {
+    m.updateNeighborList();
     viewportObservers.broadcastFunc('viewport', function (i) {
         return m.stateInEnvironmentOf(i);
     });

@@ -39,6 +39,9 @@ var neighborlist = function (size, cutoffRadius) {
         // return a list of ids that are potentially interacting with id, i.e.
         // they are in the same grid element as id or in a surrounding one,
         // considering periodic boundary conditions.
+        if (ids[id] === undefined) {
+            return [];
+        }
         var x = ids[id][0];
         var y = ids[id][1];
         var res = [];
